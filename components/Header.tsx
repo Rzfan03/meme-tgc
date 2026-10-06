@@ -2,10 +2,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { DoorOpen, Home, Library, Sparkles, Swords, Users, LogIn, LogOut, Settings, User } from 'lucide-react'
+import { Home, Library, Sparkles, Swords, Users, LogIn, LogOut, Settings, User } from 'lucide-react'
 import { displayName, useProfile, useSignOut, useUser } from '@/lib/hooks'
 import { bukaArena } from '@/components/ArenaModal'
-const NAV = [{ href: '/', label: 'Beranda', Icon: Home }, { href: '/collection', label: 'Koleksi', Icon: Library }, { href: '/create', label: 'Buat Kartu', Icon: Sparkles }, { href: '/versus', label: 'Versus', Icon: Users }, { href: '/rooms', label: 'Room', Icon: DoorOpen }]
+const NAV = [{ href: '/', label: 'Beranda', Icon: Home }, { href: '/collection', label: 'Koleksi', Icon: Library }, { href: '/create', label: 'Buat Kartu', Icon: Sparkles }, { href: '/versus', label: 'Versus', Icon: Users }]
 export function Header() {
   const path = usePathname(), { user } = useUser(), { profile } = useProfile(), signOut = useSignOut()
   const [open, setOpen] = useState(false), box = useRef<HTMLDivElement>(null)

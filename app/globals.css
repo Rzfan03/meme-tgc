@@ -317,7 +317,7 @@
   .tcg-card, * { transition: none !important; animation: none !important; transform: none !important; }
 }
 
-@media (max-width: 780px) {
+@media (max-width: 900px) {
   main { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
   .hero .w, .create, .steps { grid-template-columns: minmax(0, 1fr); }
   .hero::before { width: 90%; right: -40%; opacity: .25; }
@@ -356,7 +356,7 @@
     border-radius: 12px; padding: 4px 2px;
   }
   .tabbar a.on, .tabbar .arena-tab.on { color: var(--ac); background: var(--bg); }
-  .tabbar .arena-tab { border: 0; background: none; font: inherit; cursor: pointer; }
+  .tabbar .arena-tab { border: 0; background: none; font-family: inherit; cursor: pointer; }
 }
 
 @media (max-width: 560px) {
