@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Loader2, RotateCcw, Swords, Users } from 'lucide-react'
+import { Eye, Loader2, RotateCcw, Swords, Users } from 'lucide-react'
 import Link from 'next/link'
 import { Card } from '@/components/Card'
 import { supabase } from '@/lib/supabase'
@@ -8,8 +8,8 @@ import { useCards } from '@/lib/hooks'
 import { sfx } from '@/lib/sound'
 import { toastSuccess } from '@/lib/alert'
 import type { CardData } from '@/lib/game'
-type F = CardData & { max: number }
-type B = { id: string; p1: string; p2_cards: F[] | null; p1_cards: F[]; p1_active: number; p2_active: number; turn: string | null; status: 'waiting' | 'active' | 'done'; winner: string | null; log: string[] }
+type F = CardData & { max: number; sk?: boolean }
+type B = { id: string; p1: string; p2: string | null; p2_cards: F[] | null; p1_cards: F[]; p1_active: number; p2_active: number; turn: string | null; status: 'waiting' | 'active' | 'done'; winner: string | null; log: string[] }
 export default function Versus() {
   const { user, ready, cards, loading } = useCards()
   const [sel, setSel] = useState<string[]>([]), [bid, setBid] = useState<string | null>(null), [b, setB] = useState<B | null>(null), [err, setErr] = useState(''), [opp, setOpp] = useState(false)
@@ -36,17 +36,21 @@ export default function Versus() {
         <div style={{ marginTop: '1.5rem' }}><button className="btn rd" disabled={sel.length !== 3} onClick={find}><Users size={18} />Cari lawan</button></div></>}
       {err && <p className="err">{err}</p>}</div>)
   if (b.status === 'waiting' || !b.p1_cards || !b.p2_cards) return <div className="w page"><div className="pagehead"><h2>Versus</h2><p className="sub"><Loader2 size={18} className="spin" /> Mencari lawan. Biarkan halaman ini terbuka.</p><div className="actions"><button className="btn ln" onClick={async () => { await supabase.rpc('cancel_room', { room_id: bid }); setBid(null); setB(null) }}>Batalkan</button></div></div></div>
-  const me = b.p1 === user!.id, mine = me ? b.p1_cards : b.p2_cards, foe = me ? b.p2_cards : b.p1_cards, mi = me ? b.p1_active : b.p2_active, fi = me ? b.p2_active : b.p1_active, myTurn = b.turn === user!.id && b.status === 'active'
+  const spectator = !(b.p1 === user!.id || b.p2 === user!.id)
+  const me = b.p1 === user!.id, mine = me ? b.p1_cards : b.p2_cards, foe = me ? b.p2_cards : b.p1_cards, mi = me ? b.p1_active : b.p2_active, fi = me ? b.p2_active : b.p1_active, myTurn = !spectator && b.turn === user!.id && b.status === 'active'
   const fg = (c: F) => <div className="fg"><Card c={c} tilt={false} /><div className="hp"><div style={{ width: (c.hp / c.max) * 100 + '%' }} /></div></div>
   const mini = (c: F, i: number, active: number, mineSide: boolean) => <div key={i} className={`mini ${active === i ? 'act' : ''} ${c.hp <= 0 ? 'dead' : ''}`} style={{ '--h': c.hue, cursor: mineSide && myTurn ? 'pointer' : 'default' } as React.CSSProperties} onClick={() => mineSide && myTurn && c.hp > 0 && i !== mi && act('swap', i)}>{c.image_url && <img src={c.image_url} alt="" />}<small>{c.hp}</small></div>
+  const aktif = mine[mi], skReady = aktif.sk !== false
   return (
     <div className="w page"><div className="pagehead"><h2>Versus</h2></div>
       <div className="tray">{foe.map((c, i) => mini(c, i, fi, false))}</div>
       <div className="field">{fg(foe[fi])}<div className="vs d">VS</div>{fg(mine[mi])}</div>
       <div className="tray">{mine.map((c, i) => mini(c, i, mi, true))}</div>
-      <p className="turn">{b.status === 'done' ? (b.winner === user!.id ? 'Kamu menang!' : 'Kamu kalah. Coba lagi!') : myTurn ? 'Giliranmu. Serang atau ketuk kartu untuk ganti.' : 'Menunggu lawan...'}{b.status === 'active' && <small> ({opp ? 'lawan online' : 'lawan offline'})</small>}</p>
+      <p className="turn">{b.status === 'done' ? (spectator ? 'Pertarungan selesai.' : b.winner === user!.id ? 'Kamu menang!' : 'Kamu kalah. Coba lagi!') : spectator ? 'Menonton pertarungan...' : myTurn ? 'Giliranmu. Serang, pakai skill, atau ketuk kartu untuk ganti.' : 'Menunggu lawan...'}{b.status === 'active' && <small> ({opp ? 'lawan online' : 'lawan offline'})</small>}</p>
+      {spectator && !myTurn && <p className="sub" style={{ textAlign: 'center' }}><Eye size={14} /> Kamu menonton sebagai spectator.</p>}
       <div style={{ display: 'flex', gap: '.7rem', justifyContent: 'center' }}>
-        <button className="btn rd" disabled={!myTurn} onClick={() => act('attack')}><Swords size={18} />Serang</button>
-        {b.status === 'done' && <button className="btn ln" onClick={() => { setBid(null); setB(null); setSel([]) }}><RotateCcw size={18} />Main lagi</button>}</div>
+        {!spectator && <><button className="btn rd" disabled={!myTurn} onClick={() => act('attack')}><Swords size={18} />Serang</button><button className="btn" disabled={!myTurn || !skReady} title={aktif.skill_desc || aktif.skill} onClick={() => act('skill')}>{aktif.skill} <small>({skReady ? 'siap' : 'dipakai'})</small></button></>}
+        {b.status === 'done' && !spectator && <button className="btn ln" onClick={() => { setBid(null); setB(null); setSel([]) }}><RotateCcw size={18} />Main lagi</button>}
+        {spectator && <button className="btn ln" onClick={() => { setBid(null); setB(null); setSel([]) }}><RotateCcw size={18} />Tutup</button>}</div>
       {err && <p className="err">{err}</p>}<div className="log">{b.log.slice(-4).map((l, i) => <p key={i}>{l}</p>)}</div></div>)
 }

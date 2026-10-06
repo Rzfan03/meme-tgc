@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { DoorOpen, Dumbbell, X } from 'lucide-react'
+import { DoorOpen, Dumbbell, Swords, X } from 'lucide-react'
 
 // Modal pilihan mode arena. Dipicu oleh event 'arena-modal' (dikirim dari
 // tombol Arena di header / bottom bar) supaya hanya ada satu instance di layar.
@@ -31,7 +31,8 @@ export function ArenaModal() {
         <h3>Arena</h3>
         <p className="sub">Mau main yang mana?</p>
         <button className="arena-opt" onClick={() => go('/arena')}><Dumbbell size={22} /><span>Training<small>Lawan bot</small></span></button>
-        <button className="arena-opt" onClick={() => go('/rooms')}><DoorOpen size={22} /><span>Online<small>Lawan pemain</small></span></button>
+        <button className="arena-opt" onClick={() => go('/versus')}><Swords size={22} /><span>Versus<small>Cari lawan langsung</small></span></button>
+        <button className="arena-opt" onClick={() => go('/rooms')}><DoorOpen size={22} /><span>Room<small>Lawan pemain</small></span></button>
         <button className="x" onClick={() => setOpen(false)} aria-label="Tutup"><X size={20} /></button>
       </div>
     </div>

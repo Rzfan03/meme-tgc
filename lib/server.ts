@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import type { CardData } from '@/lib/game'
+
 // RLS `cards` hanya mengizinkan owner membaca, jadi halaman pamer + og-image
 // harus lewat service role di server. Id kartu = UUID acak, tidak bisa ditebak.
 export const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } })
@@ -37,3 +38,18 @@ export async function kartuPamer(userId: string): Promise<CardData[] | null> {
   const ordered = ids.map(id => byId.get(id)).filter(Boolean) as CardData[]
   return ordered.length ? ordered : null
 }
+
+// @vercel/og (runtime node) tidak bisa memuat gambar webp/avif, hanya png/jpeg.
+// Ambil gambar lalu konversi ke png supaya slide og-image (kartu & avatar) tampil.
+async function gambarPng(src: string | null | undefined): Promise<string | null> {
+  if (!src) return null
+  try {
+    const buf = src.startsWith('data:')
+      ? Buffer.from(src.split(',')[1] ?? '', 'base64')
+      : Buffer.from(await (await fetch(src, { signal: AbortSignal.timeout(6000) })).arrayBuffer())
+    const png = await (await import('sharp')).default(buf).png().toBuffer()
+    return `data:image/png;base64,${png.toString('base64')}`
+  } catch { return null }
+}
+
+export { gambarPng }

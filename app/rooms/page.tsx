@@ -3,17 +3,18 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Lock, Plus, RefreshCw, Swords } from 'lucide-react'
+import { Eye, Lock, Plus, RefreshCw, Swords } from 'lucide-react'
 import { Card } from '@/components/Card'
 import { PageSkeleton } from '@/components/Skeleton'
 import { supabase } from '@/lib/supabase'
 import { useCards } from '@/lib/hooks'
 type R = { id: string; name: string; host_name: string; has_password: boolean; created_at: string }
+type L = { id: string; name: string; p1_name: string; p2_name: string; created_at: string }
 export default function Rooms() {
   const router = useRouter(), { user, ready, cards, loading } = useCards()
-  const [rooms, setRooms] = useState<R[]>([]), [sel, setSel] = useState<string[]>([]), [name, setName] = useState(''), [pw, setPw] = useState(''), [ask, setAsk] = useState<string | null>(null), [jp, setJp] = useState(''), [err, setErr] = useState('')
+  const [rooms, setRooms] = useState<R[]>([]), [live, setLive] = useState<L[]>([]), [sel, setSel] = useState<string[]>([]), [name, setName] = useState(''), [pw, setPw] = useState(''), [ask, setAsk] = useState<string | null>(null), [jp, setJp] = useState(''), [err, setErr] = useState('')
   const chRef = useRef<RealtimeChannel | null>(null), [online, setOnline] = useState(1)
-  const load = useCallback(async () => { const { data } = await supabase.rpc('list_rooms'); setRooms((data ?? []) as R[]) }, [])
+  const load = useCallback(async () => { const [a, b] = await Promise.all([supabase.rpc('list_rooms'), supabase.rpc('list_live')]); setRooms((a.data ?? []) as R[]); setLive((b.data ?? []) as L[]) }, [])
   useEffect(() => {
     if (!user) return
     load()
@@ -34,7 +35,7 @@ export default function Rooms() {
   if (ready && !user) return <div className="w page"><div className="pagehead"><h2>Room</h2><p className="sub">Masuk untuk membuat atau bergabung ke room.</p><div className="actions"><Link href="/masuk" className="btn">Masuk</Link></div></div></div>
   if (loading) return <PageSkeleton />
   return (
-    <div className="w page"><div className="pagehead"><h2>Room</h2><p className="sub">Pilih 3 kartu ({sel.length}/3), lalu buat room sendiri atau gabung ke room pemain lain. {online} pemain online di lobby.</p></div>
+    <div className="w page"><div className="pagehead"><h2>Room</h2><p className="sub">Pilih 3 kartu ({sel.length}/3), lalu buat room sendiri, gabung ke room pemain lain, atau nonton battle yang berlangsung. {online} pemain online di lobby.</p></div>
       <div className="scroll">{cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} style={{ borderRadius: 14, outline: sel.includes(c.id) ? '4px solid var(--yl)' : 'none', outlineOffset: 3 }}><Card c={c} tilt={false} w={130} /></div>)}</div>
       {!cards.length && <p className="sub">Kamu belum punya kartu. Buat dulu di menu Buat Kartu.</p>}
       <div className="step" style={{ margin: '1rem 0' }}><h3>Buat room</h3>
@@ -48,6 +49,13 @@ export default function Rooms() {
             <div style={{ flex: 1, minWidth: 160 }}><h3>{r.has_password && <Lock size={16} />} {r.name}</h3><p>Host: {r.host_name}{user?.user_metadata?.full_name === r.host_name ? ' (kamu)' : ''}</p></div>
             {ask === r.id && <input className="bar" style={{ border: '2px solid var(--ln)', borderRadius: 999, padding: '.5rem 1rem', background: 'var(--sf)', color: 'var(--ink)' }} type="password" placeholder="Password room" aria-label="Password room" value={jp} onChange={e => setJp(e.target.value)} />}
             <button className="btn" onClick={() => join(r)}><Swords size={18} />Gabung</button></div>
-        )) : <p className="sub">Belum ada room yang menunggu. Buat yang pertama!</p>}</div></div>
+        )) : <p className="sub">Belum ada room yang menunggu. Buat yang pertama!</p>}</div>
+      {live.length > 0 && <> <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}><h3>Sedang berlangsung ({live.length})</h3></div>
+        <div style={{ display: 'grid', gap: '.8rem', marginTop: '1rem' }}>
+          {live.map(r => (
+            <div className="step" key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 160 }}><h3>{r.name}</h3><p>{r.p1_name} vs {r.p2_name}</p></div>
+              <button className="btn ln" onClick={() => go({ data: r.id, error: null })}><Eye size={18} />Nonton</button></div>
+          ))}</div></>}</div>
   )
 }
