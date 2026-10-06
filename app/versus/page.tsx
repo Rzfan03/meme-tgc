@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Card } from '@/components/Card'
 import { supabase } from '@/lib/supabase'
 import { useCards } from '@/lib/hooks'
+import { sfx } from '@/lib/sound'
+import { toastSuccess } from '@/lib/alert'
 import type { CardData } from '@/lib/game'
 type F = CardData & { max: number }
 type B = { id: string; p1: string; p2_cards: F[] | null; p1_cards: F[]; p1_active: number; p2_active: number; turn: string | null; status: 'waiting' | 'active' | 'done'; winner: string | null; log: string[] }
@@ -18,8 +20,13 @@ export default function Versus() {
     const ch = supabase.channel('battle-' + bid, { config: { presence: { key: user?.id ?? 'anon' } } }).on('postgres_changes', { event: '*', schema: 'public', table: 'battles', filter: `id=eq.${bid}` }, p => setB(p.new as B)).on('presence', { event: 'sync' }, () => setOpp(Object.keys(ch.presenceState()).length > 1)).subscribe(s => { if (s === 'SUBSCRIBED') ch.track({ at: Date.now() }) })
     return () => { supabase.removeChannel(ch) }
   }, [bid])
+  useEffect(() => {
+    if (!b || b.status !== 'done') return
+    if (b.winner === user?.id) { sfx('win-match'); void toastSuccess('Kamu menang!', 'Battle dimenangkan. Kartumu jagoan.') }
+    else sfx('error')
+  }, [b?.status, b?.winner, user?.id])
   const find = async () => { setErr(''); const { data, error } = await supabase.rpc('find_match', { card_ids: sel }); if (error) setErr(error.message); else setBid(data) }
-  const act = async (a: string, i = 0) => { const { error } = await supabase.rpc('battle_action', { bid, act: a, idx: i }); setErr(error?.message ?? '') }
+  const act = async (a: string, i = 0) => { if (a === 'attack') sfx('attack'); const { error } = await supabase.rpc('battle_action', { bid, act: a, idx: i }); setErr(error?.message ?? '') }
   const toggle = (id: string) => setSel(s => s.includes(id) ? s.filter(x => x !== id) : s.length < 3 ? [...s, id] : s)
   if (ready && !user) return <div className="w page"><div className="pagehead"><h2>Versus</h2><p className="sub">Masuk untuk melawan pemain lain.</p><div className="actions"><Link href="/masuk" className="btn">Masuk</Link></div></div></div>
   if (!bid || !b) return (

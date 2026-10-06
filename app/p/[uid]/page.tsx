@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: { params: Promise<{ uid: string }> }): Promise<Metadata> {
   const { uid } = await params
   const p = await pemilikPublic(uid)
-  if (!p) return { title: 'Profil tidak ditemukan · Meme TGC' }
+  if (!p) return { title: 'Profil tidak ditemukan · MultiVerse' }
 
-  const judul = `Profil ${p.nickname} · Meme TGC`
+  const judul = `Profil ${p.nickname} · MultiVerse`
   const desc = `${p.nickname}: ${p.wins} menang · ${p.losses} kalah · rating ${p.rating}`
   return {
     title: judul,
@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: Promise<{ uid: string }
         <h2>{p.nickname}</h2>
         <p className="sub">{p.wins} menang · {p.losses} kalah · rating {p.rating}</p>
         <div className="actions">
-          <Share path={`/p/${uid}`} title={`Profil ${p.nickname} · Meme TGC`}>Bagikan profil</Share>
+          <Share path={`/p/${uid}`} title={`Profil ${p.nickname} · MultiVerse`}>Bagikan profil</Share>
           <Link href="/create" className="btn ln">Buat kartumu</Link>
         </div>
       </div>

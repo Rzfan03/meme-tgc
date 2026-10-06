@@ -22,6 +22,7 @@ export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boole
   const ref = useRef<HTMLElement>(null)
   const rar = RARITIES[c.rarity] ?? RARITIES.common
   const glow = ELEMENTS[c.element] ?? '#8B5CF6'
+  const holy = GLOW[c.element] === 'rainbow'
 
   const move = (e: PointerEvent) => {
     if (!tilt) return
@@ -47,7 +48,7 @@ export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boole
     '--c2': glow,
     '--glow': glow,
     '--frame': rar.frame,
-    '--foil': rar.foil,
+    '--foil': holy ? 1 : rar.foil,
   } as CSSProperties
 
   const v = c as unknown as Record<string, number>

@@ -6,6 +6,7 @@ import { Card } from '@/components/Card'
 import { Share } from '@/components/Share'
 import { CardDetail } from '@/components/CardDetail'
 import { accessToken, useUser } from '@/lib/hooks'
+import { sfx } from '@/lib/sound'
 import { DAILY_LIMIT, type CardData } from '@/lib/game'
 
 const MAX_NAME = 40
@@ -55,8 +56,8 @@ export default function Create() {
       const r = await fetch('/api/generate', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd })
       const j = await r.json()
       if (!r.ok) throw new Error(j.error)
-      setCard(j); setName(''); setPhoto(null)
-    } catch (e) { setErr((e as Error).message) }
+      setCard(j); setName(''); setPhoto(null); sfx('success')
+    } catch (e) { setErr((e as Error).message); sfx('error') }
     setBusy(false)
   }
 
@@ -108,7 +109,7 @@ export default function Create() {
 
         <div className="stage">
           {card
-            ? <div className="rv"><Card c={card} onClick={() => setOpen(card)} /><p style={{ margin: '1.2rem 0 .7rem' }}><b>{card.name}</b> masuk koleksi sebagai <b>{card.rarity}</b></p><div className="bar" style={{ justifyContent: 'center', margin: 0 }}><Link href="/collection" className="btn">Lihat koleksi</Link><button className="btn ln" onClick={() => setCard(null)}>Cetak lagi</button><Share path={`/c/${card.id}`} title={`${card.name} · Meme TGC`}>Share</Share></div></div>
+            ? <div className="rv"><Card c={card} onClick={() => setOpen(card)} /><p style={{ margin: '1.2rem 0 .7rem' }}><b>{card.name}</b> masuk koleksi sebagai <b>{card.rarity}</b></p><div className="bar" style={{ justifyContent: 'center', margin: 0 }}><Link href="/collection" className="btn">Lihat koleksi</Link><button className="btn ln" onClick={() => setCard(null)}>Cetak lagi</button><Share path={`/c/${card.id}`} title={`${card.name} · MultiVerse`}>Share</Share></div></div>
             : <div className="idle"><Sparkles size={40} /><p>Ketik nama karakter,<br />kartunya akan muncul di sini.</p></div>}
         </div>
       </div>

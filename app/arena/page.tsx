@@ -6,13 +6,16 @@ import { Card } from '@/components/Card'
 import { PageSkeleton } from '@/components/Skeleton'
 import { useCards } from '@/lib/hooks'
 import { BOTS, hit, type CardData } from '@/lib/game'
+import { sfx } from '@/lib/sound'
+import { toastSuccess } from '@/lib/alert'
 type F = CardData & { max: number }
 type S = { me: F[]; foe: F[]; mi: number; fi: number; log: string[]; busy: boolean; over: boolean; pop: { id: string; d: number } | null }
 const pick = (a: CardData[]): F[] => [...a].sort(() => Math.random() - 0.5).slice(0, 3).map(c => ({ ...c, max: c.hp }))
 function foeTurn(b: S): S {
   const me = b.me[b.mi], fo = b.foe[b.fi], [d] = hit(fo, me)
+  sfx('use-poison', 0.6)
   b.pop = { id: 'fm', d }; b.log.push(`${fo.name} membalas ${d} damage`)
-  if (me.hp <= 0) { b.log.push(me.name + ' tumbang'); if (b.me.every(c => c.hp <= 0)) b.over = true; else b.mi = b.me.findIndex(c => c.hp > 0) }
+  if (me.hp <= 0) { b.log.push(me.name + ' tumbang'); if (b.me.every(c => c.hp <= 0)) { b.over = true; sfx('error') } else b.mi = b.me.findIndex(c => c.hp > 0) }
   b.busy = false; return b
 }
 export default function Arena() {
@@ -22,9 +25,10 @@ export default function Arena() {
   const later = () => setTimeout(() => setB(s => s && foeTurn(structuredClone(s))), 900)
   const attack = () => {
     if (!b) return
+    sfx('attack')
     const n = structuredClone(b), me = n.me[n.mi], fo = n.foe[n.fi], [d, m] = hit(me, fo)
     n.busy = true; n.pop = { id: 'ff', d }; n.log.push(`${me.name} menyerang ${d} damage${m > 1 ? ' (efektif!)' : m < 1 ? ' (kurang efektif)' : ''}`)
-    if (fo.hp <= 0) { n.log.push(fo.name + ' tumbang'); if (n.foe.every(c => c.hp <= 0)) n.over = true; else n.fi = n.foe.findIndex(c => c.hp > 0); n.busy = false; return setB(n) }
+    if (fo.hp <= 0) { n.log.push(fo.name + ' tumbang'); if (n.foe.every(c => c.hp <= 0)) { n.over = true; sfx('win-match'); void toastSuccess('Kamu menang!', 'Kartumu menghabisi semua lawan.') } else n.fi = n.foe.findIndex(c => c.hp > 0); n.busy = false; return setB(n) }
     setB(n); later()
   }
   const swap = (i: number) => {

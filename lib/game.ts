@@ -4,7 +4,7 @@ export const BEATS: Record<El, El> = { 'Holy Card': 'Mogger', Mogger: 'Chaoz', C
 export type Rarity = 'common' | 'rare' | 'epic' | 'legendary'
 export const RARITY_LABEL: Record<Rarity, string> = { common: 'Umum', rare: 'Langka', epic: 'Epik', legendary: 'Legendaris' }
 export const BUDGET: Record<Rarity, number> = { common: 100, rare: 120, epic: 140, legendary: 165 }
-export const DAILY_LIMIT = 3
+export const DAILY_LIMIT = 10
 export type CardData = { id: string; name: string; element: El; rarity: Rarity; hp: number; atk: number; def: number; spd: number; skill: string; skill_desc: string; hue: number; image_url?: string | null; emoji?: string }
 export function rarityFromHash(h: string): Rarity {
   const r = parseInt(h.slice(0, 8), 16) / 0xffffffff

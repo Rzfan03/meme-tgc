@@ -71,13 +71,14 @@ export default function Account() {
         <div className="bar" style={{ margin: '1rem 0 0' }}>
           <Link href={`/p/${user.id}`} className="btn ln"><User size={18} />Halaman profil publik</Link>
           <Pamer />
-          <Share path={`/p/${user.id}`} title={`Profil ${profile?.nickname ?? displayName(user)} · Meme TGC`}>Bagikan profil</Share>
+          <Share path={`/p/${user.id}`} title={`Profil ${profile?.nickname ?? displayName(user)} · MultiVerse`}>Bagikan profil</Share>
         </div>
         {profile && <>
           <div className="row" style={{ margin: '1.2rem 0' }}>
             <div className="stat"><b>{profile.wins}</b><small>Menang</small></div>
             <div className="stat"><b>{profile.losses}</b><small>Kalah</small></div>
             <div className="stat"><b>{profile.rating}</b><small>Rating</small></div>
+            <div className="stat"><b>{profile.points.toLocaleString('id-ID')}</b><small>Poin</small></div>
           </div>
           <div className="bar" style={{ margin: 0 }}>
             <input value={nick} maxLength={24} onChange={e => setNick(e.target.value)} placeholder="Nama tampilan" aria-label="Nama tampilan" />
@@ -92,7 +93,7 @@ export default function Account() {
           </div>
           {cards.length > 6 && <p style={{ textAlign: 'center', margin: '1rem 0 0' }}><Link href="/collection" className="btn ln">Lihat semua ({cards.length})</Link></p>}
         </>}
-        {!profile && <p className="sub" style={{ marginTop: '1.2rem', marginBottom: 0 }}>Baris profil belum terbaca. Jalankan <code>supabase/tambah_avatar.sql</code> di SQL Editor Supabase.</p>}
+        {!profile && <p className="sub" style={{ marginTop: '1.2rem', marginBottom: 0 }}>Profil tidak terbaca. Pastikan semua migrasi <code>supabase/*.sql</code> sudah dijalankan di SQL Editor Supabase.</p>}
         {msg && <p className="ok">{msg}</p>}
       </section>
 

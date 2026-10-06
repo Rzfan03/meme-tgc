@@ -13,10 +13,10 @@ type Publik = CardData & { user_id: string; created_at: string }
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
   const c = (await kartuPublic(id)) as Publik | null
-  if (!c) return { title: 'Kartu tidak ditemukan · Meme TGC' }
+  if (!c) return { title: 'Kartu tidak ditemukan · MultiVerse' }
 
   const desc = `${RARITY_LABEL[c.rarity]} · Element ${c.element} · ${c.skill}: ${c.skill_desc} (HP ${c.hp} · ATK ${c.atk} · DEF ${c.def} · SPD ${c.spd})`
-  const judul = `${c.name} · Meme TGC`
+  const judul = `${c.name} · MultiVerse`
   return {
     title: judul,
     description: desc,
@@ -43,7 +43,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <span className="ow-av">{p?.avatar ? <img src={p.avatar} alt="" /> : awal}</span>
         <div>
           <span className="rar-cap">Dibagikan oleh</span>
-          <b>{p?.nickname ?? 'Pemain Meme TGC'}</b>
+          <b>{p?.nickname ?? 'Pemain MultiVerse'}</b>
           <small>{p ? `${p.wins} menang · ${p.losses} kalah · rating ${p.rating}` : 'Pemilik kartu ini belum mengisi profil.'}</small>
           {p && <Link href={`/p/${c.user_id}`}>Lihat profil →</Link>}
         </div>
@@ -72,7 +72,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           </div>
 
           <div className="sharebtns">
-            <Share path={`/c/${c.id}`} title={`${c.name} · Meme TGC`}>Bagikan kartu ini</Share>
+            <Share path={`/c/${c.id}`} title={`${c.name} · MultiVerse`}>Bagikan kartu ini</Share>
             <Link href="/create" className="btn ln">Buat kartumu</Link>
           </div>
         </div>

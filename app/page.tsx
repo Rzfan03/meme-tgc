@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <section className="hero"><div className="w">
-        <div><h1>Meme-mu jadi kartu. Kartumu jadi jagoan.</h1><p>Upload meme atau foto apa saja. AI memberi nama, elemen, dan jurus, lalu kartumu siap diadu.</p>
+        <div><h1>Semua bisa jadi kartu. Kartumu jadi jagoan.</h1><p>Upload meme, foto, atau apa saja. AI memberi nama, elemen, dan jurus, lalu kartumu siap diadu.</p>
           <div style={{ display: 'flex', gap: '.8rem', flexWrap: 'wrap' }}><Link href="/create" className="btn"><Sparkles size={18} />Buat kartu pertamamu</Link><Link href="/arena" className="btn ln"><Swords size={18} />Langsung battle</Link></div></div>
         <div className="fan">{[BOTS[3], BOTS[1], BOTS[2]].map(c => <Card key={c.id} c={c} tilt={false} />)}</div>
       </div></section>

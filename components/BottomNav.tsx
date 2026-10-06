@@ -4,8 +4,9 @@ import { usePathname } from 'next/navigation'
 import { Home, Layers, MoreHorizontal, Sparkles, Swords } from 'lucide-react'
 import { bukaArena } from '@/components/ArenaModal'
 import { bukaLainnya } from '@/components/MoreModal'
+import type { ComponentType } from 'react'
 
-const TABS = [
+const TABS: { href: string; label: string; Icon: ComponentType<{ size?: number; strokeWidth?: number }> }[] = [
   { href: '/', label: 'Beranda', Icon: Home },
   { href: '/collection', label: 'Koleksi', Icon: Layers },
   { href: '/create', label: 'Buat', Icon: Sparkles },
@@ -32,7 +33,10 @@ export function BottomNav() {
           </button>
         )
         const on = href === '/' ? path === '/' : path.startsWith(href)
-        return <Link key={href} href={href} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined}><Icon size={20} strokeWidth={2.4} /><span>{label}</span></Link>
+        return <Link key={href} href={href} className={on ? 'on' : ''} aria-current={on ? 'page' : undefined}>
+          <Icon size={20} strokeWidth={2.4} />
+          <span>{label}</span>
+        </Link>
       })}
     </nav>
   )

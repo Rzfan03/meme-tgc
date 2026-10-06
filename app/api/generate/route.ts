@@ -10,12 +10,19 @@ const OR_URL = 'https://openrouter.ai/api/v1/chat/completions'
 // Cloudflare Groq balas 1010 kalau request tanpa User-Agent browser-like
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
 const err = (m: string, s: number) => NextResponse.json({ error: m }, { status: s })
-const PROMPT = `Kamu desainer stat kartu game. Dari NAMA karakter yang diberikan, buat kartu sesuai kemampuan aslinya.
-Balas HANYA JSON: {"safe":boolean,"element":"${Object.keys(ELEMENTS).join('|')}","skill":string (maks 3 kata),"skill_desc":string (maks 12 kata, bahasa Indonesia),"weights":{"hp":1-10,"atk":1-10,"def":1-10,"spd":1-10}}.
-Aturan:
-- Kalau karakter dikenal, pakai kemampuan kanoniknya. Contoh: "Ichigo Kurosaki" (Bleach) = pedang Zangetsu, Bankai, regenerasi cepat, atk dan spd tinggi.
-- Kalau nama tidak dikenal atau bukan tokoh, buat stat yang masuk akal sesuai nama itu.
-- weights: hp ketahanan, atk serangan, def pertahanan, spd kecepatan. Jangan semuanya 10, beri variasi.
+const PROMPT = `Kamu desainer stat kartu game. Dari NAMA karakter yang diberikan, buat kartu sesuai kemampuan aslinya, dengan stat yang ADIL, PRESISI, dan seimbang.
+Balas HANYA JSON: {"safe":boolean,"element":"${Object.keys(ELEMENTS).join('|')}","skill":string (maks 3 kata),"skill_desc":string (maks 12 kata, bahasa Indonesia),"weights":{"hp":1-9,"atk":1-9,"def":1-9,"spd":1-9}}.
+Aturan PENAKARAN STAT (paling penting):
+- weights harus TOTAL PERSIS 24, masing-masing antara 1 dan 9.
+- Bagikan 24 poin proporsional kemampuan nyata. Jangan menang semuanya ke atk: keseimbangan hp/def (bertahan) melawan atk/spd (menyerang) harus masuk akal.
+- Glosarium: hp = ketahanan, atk = serangan, def = pertahanan, spd = kecepatan.
+- Contoh skala yang adil per arketipe (total 24):
+  • Tank: hp 8, def 8, atk 4, spd 4.
+  • Glass cannon: atk 8, spd 8, hp 5, def 3.
+  • Seimbang: hp 6, atk 6, def 6, spd 6.
+- Kalau karakter dikenal, teliti kemampuan kanoniknya dan sesuaikan. Contoh: "Ichigo Kurosaki" (Bleach) = Bankai, pedang Zangetsu, regenerasi cepat → condong atk+spd, misal hp 6, atk 7, def 5, spd 6.
+- Kalau nama tidak dikenal atau bukan tokoh, buat stat masuk akal sesuai nama.
+- JANGAN memakai total di atas 24 dan jangan rata-rata 6 ke atas untuk semua. Variasikan antar arketipe; kartu lemah boleh total rendah (misal 18-20).
 - "safe" false hanya jika nama berisi konten seksual eksplisit, ujaran kebencian, atau pelecehan anak.`
 
 export async function POST(req: NextRequest) {
@@ -41,7 +48,7 @@ export async function POST(req: NextRequest) {
   // Coba Groq dulu; kalau limit/error, alihkan ke OpenRouter (model :free)
   const proms = (name: string, url: string, key: string | undefined, model: string) => ({
     name, url, key, model,
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}`, 'User-Agent': UA, ...(name === 'openrouter' ? { 'HTTP-Referer': 'http://localhost:3000', 'X-Title': 'Meme TGC' } : {}) } as Record<string, string>,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}`, 'User-Agent': UA, ...(name === 'openrouter' ? { 'HTTP-Referer': 'http://localhost:3000', 'X-Title': 'MultiVerse' } : {}) } as Record<string, string>,
   })
   const provs = [
     proms('groq', GROQ_URL, process.env.GROQ_API_KEY, process.env.GROQ_MODEL ?? 'openai/gpt-oss-120b'),
