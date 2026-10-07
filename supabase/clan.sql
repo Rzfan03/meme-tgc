@@ -189,7 +189,26 @@ begin
   return tid;
 end $$;
 
+-- ketua/wakil mengeluarkan anggota
+create or replace function public.kick_member(target uuid) returns void
+language plpgsql security definer set search_path=public as $$
+declare uid uuid := auth.uid(); cid uuid;
+begin
+  perform public.cek_ban();
+  if uid is null then raise exception 'Masuk dulu'; end if;
+  select clan_id into cid from profiles where id = uid;
+  if cid is null then raise exception 'Kamu tidak punya clan'; end if;
+  if not exists(select 1 from clans where id = cid and (leader_id = uid or vice_id = uid)) then
+    raise exception 'Hanya ketua/wakil yang bisa mengeluarkan anggota';
+  end if;
+  if target = uid then raise exception 'Tidak bisa mengeluarkan diri sendiri'; end if;
+  if exists(select 1 from clans where id = cid and leader_id = target) then raise exception 'Tidak bisa mengeluarkan ketua'; end if;
+  if not exists(select 1 from profiles where id = target and clan_id = cid) then raise exception 'Bukan anggota clan-mu'; end if;
+  update profiles set clan_id = null where id = target;
+  update clans set vice_id = null where id = cid and vice_id = target;
+end $$;
+
 -- clan_penuh hanya dipanggil internal fungsi lain, jadi tidak di-grant ke klien
 revoke all on function public.clan_penuh(uuid) from public, anon, authenticated;
-revoke all on function public.create_clan(text, text), public.request_join(text), public.approve_join(uuid), public.reject_join(uuid), public.cancel_join(uuid), public.leave_clan(), public.set_vice(uuid), public.add_member(text) from public, anon;
-grant execute on function public.create_clan(text, text), public.request_join(text), public.approve_join(uuid), public.reject_join(uuid), public.cancel_join(uuid), public.leave_clan(), public.set_vice(uuid), public.add_member(text) to authenticated;
+revoke all on function public.create_clan(text, text), public.request_join(text), public.approve_join(uuid), public.reject_join(uuid), public.cancel_join(uuid), public.leave_clan(), public.set_vice(uuid), public.add_member(text), public.kick_member(uuid) from public, anon;
+grant execute on function public.create_clan(text, text), public.request_join(text), public.approve_join(uuid), public.reject_join(uuid), public.cancel_join(uuid), public.leave_clan(), public.set_vice(uuid), public.add_member(text), public.kick_member(uuid) to authenticated;

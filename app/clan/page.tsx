@@ -31,7 +31,8 @@ export default function ClanPage() {
       setClan(null); setMembers([]); setReqs([])
       const [{ data: r }, { data: cs }] = await Promise.all([
         supabase.from('clan_requests').select('id, clans(tag, name)').eq('user_id', user.id).limit(1).maybeSingle(),
-        supabase.from('clans').select('id,name,tag,profiles(id)').order('created_at', { ascending: true }),
+        // profiles!profiles_clan_id_fkey: embed polos 'profiles(id)' ambigu (ada 3 FK ke profiles)
+        supabase.from('clans').select('id,name,tag,profiles!profiles_clan_id_fkey(id)').order('created_at', { ascending: true }),
       ])
       const x = r as { id: string; clans: { tag: string; name: string } | { tag: string; name: string }[] | null } | null
       const c2 = x ? (Array.isArray(x.clans) ? x.clans[0] : x.clans) : null
@@ -80,6 +81,10 @@ export default function ClanPage() {
   }
   const setVice = (target: string | null) =>
     run(() => supabase.rpc('set_vice', { target }), target ? 'Wakil ditetapkan.' : 'Wakil dicabut.')
+  const kick = (target: string, nick: string) => {
+    if (!window.confirm(`Keluarkan "${nick}" dari clan?`)) return
+    void run(() => supabase.rpc('kick_member', { target }), 'Anggota dikeluarkan.')
+  }
   const keluar = () => {
     if (!window.confirm('Keluar dari clan?')) return
     void run(() => supabase.rpc('leave_clan'), 'Kamu keluar dari clan.')
@@ -150,6 +155,9 @@ export default function ClanPage() {
                   >
                     {clan.vice_id === m.id ? 'Cabut wakil' : 'Jadikan wakil'}
                   </button>
+                )}
+                {(isLeader || isWakil) && m.id !== user!.id && m.id !== clan.leader_id && (
+                  <button className="btn sm rd" disabled={busy} onClick={() => kick(m.id, m.nickname)}>Kick</button>
                 )}
                 <small className="sub" style={{ marginLeft: 'auto' }}>{m.wins} menang · {m.rating} rating</small>
               </div>
