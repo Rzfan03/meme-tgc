@@ -37,7 +37,7 @@ export default function Arena() {
   }
   if (loading) return <PageSkeleton />
   if (!loading && !cards.length) return <div className="w page"><div className="pagehead"><h2>Arena</h2><p className="sub">Kamu butuh minimal satu kartu untuk bertarung.</p><div className="actions"><Link href="/create" className="btn"><Sparkles size={18} />Buat kartu</Link></div></div></div>
-  if (!b) return <div className="w page"><div className="pagehead"><h2>Arena</h2><p className="sub">Tiga kartu acak dari koleksimu melawan bot. Elemen unggul memberi damage 1,5 kali.</p><div className="actions"><button className="btn rd" disabled={loading} onClick={start}><Swords size={18} />Mulai battle</button></div></div></div>
+  if (!b) return <div className="w page"><div className="pagehead"><h2>Arena</h2><p className="sub">Tiga kartu acak dari koleksimu melawan bot. Elemen unggul memberi damage 1,5 kali.</p><div className="actions"><button className="btn bl" disabled={loading} onClick={start}><Swords size={18} />Mulai battle</button></div></div></div>
   const win = b.foe.every(c => c.hp <= 0)
   const fg = (c: F, id: string) => <div className={`fg ${b.pop?.id === id ? 'hit' : ''}`} key={id + b.log.length}>{b.pop?.id === id && <span className="dmg">-{b.pop.d}</span>}<Card c={c} tilt={false} /><div className="hp"><div style={{ width: (c.hp / c.max) * 100 + '%' }} /></div></div>
   const mini = (c: F, i: number, mine: boolean) => <div key={c.id + i} className={`mini ${(mine ? b.mi : b.fi) === i ? 'act' : ''} ${c.hp <= 0 ? 'dead' : ''}`} style={{ '--h': c.hue, cursor: mine ? 'pointer' : 'default' } as React.CSSProperties} onClick={() => mine && swap(i)}>{c.image_url ? <img src={c.image_url} alt="" /> : c.emoji}<small>{c.hp}</small></div>

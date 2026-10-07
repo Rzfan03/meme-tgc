@@ -37,12 +37,12 @@ export default function Rooms() {
   if (loading) return <PageSkeleton />
   return (
     <div className="w page"><div className="pagehead"><h2>Room</h2><p className="sub">Pilih 3 kartu ({sel.length}/3), lalu buat room sendiri, gabung ke room pemain lain, atau nonton battle yang berlangsung. {online} pemain online di lobby.</p></div>
-      <div className="scroll">{cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} style={{ borderRadius: 14, outline: sel.includes(c.id) ? '4px solid var(--yl)' : 'none', outlineOffset: 3 }}><Card c={c} tilt={false} w={130} /></div>)}</div>
+      <div className="scroll">{cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} className={sel.includes(c.id) ? 'picked on' : 'picked'}><Card c={c} tilt={false} w={130} /></div>)}</div>
       <DeckBar cards={cards} sel={sel} onPick={ids => setSel(ids)} />
       {!cards.length && <p className="sub">Kamu belum punya kartu. Buat dulu di menu Buat Kartu.</p>}
       <div className="step" style={{ margin: '1rem 0' }}><h3>Buat room</h3>
         <div className="bar" style={{ marginTop: '.8rem' }}><input placeholder="Nama room" aria-label="Nama room" maxLength={40} value={name} onChange={e => setName(e.target.value)} /><input type="password" placeholder="Password (opsional)" aria-label="Password room" maxLength={50} value={pw} onChange={e => setPw(e.target.value)} />
-          <button className="btn rd" disabled={!name.trim()} onClick={create}><Plus size={18} />Buat room</button></div></div>
+          <button className="btn bl" disabled={!name.trim()} onClick={create}><Plus size={18} />Buat room</button></div></div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}><h3>Daftar room ({rooms.length})</h3><button className="btn ln" onClick={load}><RefreshCw size={16} />Segarkan</button></div>
       {err && <p className="err">{err}</p>}
       <div style={{ display: 'grid', gap: '.8rem', marginTop: '1rem' }}>

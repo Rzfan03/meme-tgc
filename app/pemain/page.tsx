@@ -24,7 +24,7 @@ export default function Pemain() {
       <div className="pagehead"><h2>Cari Pemain</h2><p className="sub">Temukan pemain lain lewat nama tampilan.</p></div>
       <form className="bar" style={{ maxWidth: 480 }} onSubmit={cari}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Nama pemain..." aria-label="Nama pemain" />
-        <button className="btn rd" disabled={busy || !q.trim()}><Search size={18} />Cari</button>
+        <button className="btn bl" disabled={busy || !q.trim()}><Search size={18} />Cari</button>
       </form>
       {pesan && <p className="sub" style={{ marginTop: '1rem' }}>{pesan}</p>}
       {hasil && hasil.length > 0 && (

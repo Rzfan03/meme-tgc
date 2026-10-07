@@ -100,7 +100,7 @@ export default function Create() {
             ))}
           </div>
 
-          <button className="btn rd full" disabled={!canGo} onClick={gen}>
+          <button className="btn bl full" disabled={!canGo} onClick={gen}>
             {busy ? <Loader2 size={18} className="spin" /> : <Sparkles size={18} />}
             {busy ? 'AI sedang menghitung...' : photo ? 'Cetak dengan foto' : 'Cetak kartu'}
           </button>

@@ -57,9 +57,9 @@ export default function Peringkat() {
             <div className="dlg-head"><h3>Tantang {target.nickname}</h3><button className="x" onClick={() => setTarget(null)} aria-label="Tutup">×</button></div>
             <p className="sub">Pilih 3 kartu milikmu ({sel.length}/3). Room tantangan dibuat & lawan kamu dapat notifikasi.</p>
             <DeckBar cards={cards} sel={sel} onPick={ids => setSel(ids)} />
-            <div className="scroll" style={{ marginTop: '1rem' }}>{cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} style={{ borderRadius: 14, outline: sel.includes(c.id) ? '4px solid var(--yl)' : 'none', outlineOffset: 3 }}><Card c={c} tilt={false} w={130} /></div>)}</div>
+            <div className="scroll" style={{ marginTop: '1rem' }}>{cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} className={sel.includes(c.id) ? 'picked on' : 'picked'}><Card c={c} tilt={false} w={130} /></div>)}</div>
             {!cards.length && <div className="empty">Kamu belum punya kartu. <Link href="/create">Buat dulu.</Link></div>}
-            <div style={{ marginTop: '1rem' }}><button className="btn rd" disabled={sel.length !== 3 || sending} onClick={kirim}>{sending ? <Loader2 size={16} className="spin" /> : <Swords size={16} />}Kirim tantangan</button></div>
+            <div style={{ marginTop: '1rem' }}><button className="btn bl" disabled={sel.length !== 3 || sending} onClick={kirim}>{sending ? <Loader2 size={16} className="spin" /> : <Swords size={16} />}Kirim tantangan</button></div>
           </div>
         </div>
       )}

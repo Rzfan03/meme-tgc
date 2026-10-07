@@ -41,8 +41,8 @@ export default function Versus() {
     <div className="w page"><div className="pagehead"><h2>Versus</h2><p className="sub">Pilih tepat 3 kartu ({sel.length}/3), lalu cari lawan. Semua perhitungan dilakukan di server.</p></div>
       {bid ? <p><Loader2 size={18} className="spin" /> Memuat battle...</p> : <>
         <DeckBar cards={cards} sel={sel} onPick={ids => setSel(ids)} />
-        <div className="grid">{loading ? <div className="empty">Memuat kartu...</div> : cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} style={{ borderRadius: 18, outline: sel.includes(c.id) ? '4px solid var(--yl)' : 'none', outlineOffset: 4 }}><Card c={c} tilt={false} /></div>)}</div>
-        <div style={{ marginTop: '1.5rem' }}><button className="btn rd" disabled={sel.length !== 3} onClick={find}><Users size={18} />Cari lawan</button></div></>}
+        <div className="grid">{loading ? <div className="empty">Memuat kartu...</div> : cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} className={sel.includes(c.id) ? 'picked on' : 'picked'}><Card c={c} tilt={false} /></div>)}</div>
+        <div style={{ marginTop: '1.5rem' }}><button className="btn bl" disabled={sel.length !== 3} onClick={find}><Users size={18} />Cari lawan</button></div></>}
       {err && <p className="err">{err}</p>}</div>)
   if (b.status === 'waiting' || !b.p1_cards || !b.p2_cards) return <div className="w page"><div className="pagehead"><h2>Versus</h2><p className="sub"><Loader2 size={18} className="spin" /> Mencari lawan. Biarkan halaman ini terbuka.</p><div className="actions"><button className="btn ln" onClick={async () => { await supabase.rpc('cancel_room', { room_id: bid }); setBid(null); setB(null) }}>Batalkan</button></div></div></div>
   const spectator = !(b.p1 === user!.id || b.p2 === user!.id)

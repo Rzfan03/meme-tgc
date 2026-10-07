@@ -59,7 +59,7 @@ export default function Admin() {
         <h3><Pencil size={20} />Cari & edit kartu</h3>
         <div className="bar" style={{ marginTop: '.8rem' }}>
           <input value={q} onChange={e => { setQ(e.target.value); }} placeholder="Nama kartu / pemain / id..." aria-label="Cari kartu" />
-          <button className="btn rd" onClick={load}><Search size={18} />Cari</button>
+          <button className="btn bl" onClick={load}><Search size={18} />Cari</button>
         </div>
         <div className="seg" style={{ marginTop: '.6rem' }}>
           <button className={`chip${el === '' ? ' on' : ''}`} onClick={() => setEl('')}>Semua</button>
@@ -76,7 +76,7 @@ export default function Admin() {
               <small className="sub" style={{ margin: 0 }}>{c.owner}</small>
               <button className="btn" onClick={() => setEdit(c)} disabled={busy}><Edit size={16} />Edit</button>
               <button className="btn ln" onClick={() => setXf(c)} disabled={busy}><Link2 size={16} />Pindah</button>
-              <button className="btn ln" style={{ color: '#e0525f' }} onClick={() => setDel(c)} disabled={busy}><Trash2 size={16} />Hapus</button>
+              <button className="btn rd" onClick={() => setDel(c)} disabled={busy}><Trash2 size={16} />Hapus</button>
             </div>
           )) : <p className="sub">Tidak ada kartu.</p>}
         </div>
@@ -86,19 +86,19 @@ export default function Admin() {
         <h3><Megaphone size={20} />Pengumuman ke semua pemain</h3>
         <input value={btitle} onChange={e => setBtitle(e.target.value)} style={{ marginTop: '.8rem' }} placeholder="Judul" aria-label="Judul pengumuman" />
         <input value={bbody} onChange={e => setBbody(e.target.value)} placeholder="Isi pengumuman" aria-label="Isi pengumuman" />
-        <button className="btn rd" disabled={busy || !btitle.trim() || !bbody.trim()} onClick={async () => { if (await rpc('admin_broadcast', { title: btitle.trim(), body: bbody.trim() })) { setBtitle(''); setBbody('') } }}><Megaphone size={16} />Kirim</button>
+        <button className="btn bl" disabled={busy || !btitle.trim() || !bbody.trim()} onClick={async () => { if (await rpc('admin_broadcast', { title: btitle.trim(), body: bbody.trim() })) { setBtitle(''); setBbody('') } }}><Megaphone size={16} />Kirim</button>
       </section>
 
       <section className="panel">
         <h3><Ban size={20} />Kelola pemain</h3>
-        <div className="bar" style={{ marginTop: '.6rem' }}><input value={bq} onChange={e => setBq(e.target.value)} placeholder="Nama / id pemain..." aria-label="Cari pemain" /><button className="btn" onClick={async () => { setBusy(true); const { data, error } = await supabase.rpc('admin_list_players', { q: bq }); setBusy(false); if (error) say(error.message); else setPpl((data ?? []) as APlayer[]) }}>Cari</button></div>
+        <div className="bar" style={{ marginTop: '.6rem' }}><input value={bq} onChange={e => setBq(e.target.value)} placeholder="Nama / id pemain..." aria-label="Cari pemain" /><button className="btn bl" onClick={async () => { setBusy(true); const { data, error } = await supabase.rpc('admin_list_players', { q: bq }); setBusy(false); if (error) say(error.message); else setPpl((data ?? []) as APlayer[]) }}>Cari</button></div>
         <div style={{ display: 'grid', gap: '.6rem', marginTop: '1rem' }}>
           {ppl.map(p => (
             <div className="row" key={p.id} style={{ gap: '.7rem', background: 'var(--sf)', border: '1px solid var(--ln)', borderRadius: 16, padding: '.5rem .8rem' }}>
               <span className="ow-av" style={{ width: 34, height: 34, fontSize: '.9rem' }}>{p.avatar ? <img src={p.avatar} alt="" /> : p.nickname.slice(0, 1).toUpperCase()}</span>
-              <div style={{ flex: 1, minWidth: 0 }}><b>{p.nickname}{p.is_admin && ' 👑'}</b><br /><small className="sub" style={{ margin: 0 }}>rating {p.rating} · {p.points.toLocaleString('id-ID')} poin · {p.wins}W/{p.losses}L</small></div>
-              {p.banned && <small style={{ color: '#e0525f', fontWeight: 700 }}>BANNED</small>}
-              {!p.is_admin && <button className="btn ln" style={p.banned ? { color: 'var(--ac)' } : { color: '#e0525f' }} disabled={busy} onClick={() => rpc('admin_set_ban', { pid: p.id, banned: !p.banned }).then(() => setPpl(l => l.map(x => x.id === p.id ? { ...x, banned: !p.banned } : x)))}>{p.banned ? <><Check size={16} />Unban</> : <><UserX size={16} />Ban</>}</button>}
+              <div style={{ flex: 1, minWidth: 0 }}><b>{p.nickname}{p.is_admin && <Shield size={14} style={{ display: 'inline-flex', verticalAlign: '-3px', marginLeft: '.25rem' }} />}</b><br /><small className="sub" style={{ margin: 0 }}>rating {p.rating} · {p.points.toLocaleString('id-ID')} poin · {p.wins}W/{p.losses}L</small></div>
+              {p.banned && <small style={{ color: 'var(--rd)', fontWeight: 700 }}>BANNED</small>}
+              {!p.is_admin && <button className="btn ln" style={p.banned ? { color: 'var(--ac)' } : { color: 'var(--rd)' }} disabled={busy} onClick={() => rpc('admin_set_ban', { pid: p.id, banned: !p.banned }).then(() => setPpl(l => l.map(x => x.id === p.id ? { ...x, banned: !p.banned } : x)))}>{p.banned ? <><Check size={16} />Unban</> : <><UserX size={16} />Ban</>}</button>}
             </div>
           ))}
         </div>
@@ -111,7 +111,7 @@ export default function Admin() {
       </Modal>}
 
       {xf && <Modal title={`Pindah "${xf.name}" ke pemain lain`} onClose={() => setXf(null)}>
-        <div className="bar" style={{ margin: 0 }}><input value={pq} onChange={e => setPq(e.target.value)} placeholder="Cari pemain target..." aria-label="Cari pemain tujuan" /><button className="btn" onClick={async () => { setBusy(true); const { data, error } = await supabase.rpc('admin_list_players', { q: pq }); setBusy(false); if (error) say(error.message); else setPl((data ?? []) as APlayer[]) }}>Cari</button></div>
+        <div className="bar" style={{ margin: 0 }}><input value={pq} onChange={e => setPq(e.target.value)} placeholder="Cari pemain target..." aria-label="Cari pemain tujuan" /><button className="btn bl" onClick={async () => { setBusy(true); const { data, error } = await supabase.rpc('admin_list_players', { q: pq }); setBusy(false); if (error) say(error.message); else setPl((data ?? []) as APlayer[]) }}>Cari</button></div>
         <div style={{ display: 'grid', gap: '.5rem', marginTop: '1rem' }}>
           {pl.filter(p => p.id !== xf.user_id && !p.banned).map(p => (
             <div className="row" key={p.id} style={{ gap: '.6rem', background: 'var(--bg)', border: '1px solid var(--ln)', borderRadius: 12, padding: '.4rem .7rem' }}>
@@ -125,7 +125,7 @@ export default function Admin() {
 
       {del && <Modal title="Konfirmasi hapus kartu" onClose={() => setDel(null)}>
         <p className="sub" style={{ margin: 0 }}>Hapus <b>{del.name}</b> milik <b>{del.owner}</b>? Ini tidak bisa dibatalkan.</p>
-        <div className="bar" style={{ marginTop: '1rem' }}><button className="btn" onClick={() => setDel(null)}>Batal</button><button className="btn rd" style={{ background: '#e0525f' }} disabled={busy} onClick={() => rpc('admin_delete_card', { cid: del.id }).then(() => setDel(null))}>Hapus</button></div>
+        <div className="bar" style={{ marginTop: '1rem' }}><button className="btn" onClick={() => setDel(null)}>Batal</button><button className="btn rd" disabled={busy} onClick={() => rpc('admin_delete_card', { cid: del.id }).then(() => setDel(null))}>Hapus</button></div>
       </Modal>}
     </div>
   )
@@ -133,7 +133,7 @@ export default function Admin() {
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return <div className="modal on" onClick={e => e.target === e.currentTarget && onClose()}><div className="dlg" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={title}>
-    <div className="dlg-head"><h3>{title}</h3><button className="ic" onClick={onClose} aria-label="Tutup"><X size={18} /></button></div>
+    <div className="dlg-head"><h3>{title}</h3><button className="x" onClick={onClose} aria-label="Tutup"><X size={18} /></button></div>
     {children}
   </div></div>
 }
@@ -155,6 +155,6 @@ function EditForm({ c, busy, onSave }: { c: ACard; busy: boolean; onSave: (p: Pa
     </div>
     <div><label className="sub">Skill</label><input value={f.skill} maxLength={40} onChange={e => set('skill', e.target.value)} aria-label="Skill" /></div>
     <div><label className="sub">Deskripsi skill</label><input value={f.desc} maxLength={100} onChange={e => set('desc', e.target.value)} aria-label="Deskripsi skill" /></div>
-    <button className="btn rd" disabled={busy || f.name.trim().length < 2} onClick={() => onSave({ new_name: f.name.trim(), new_element: f.el, new_hp: num(f.hp), new_atk: num(f.atk), new_def: num(f.def), new_spd: num(f.spd), new_skill: f.skill.trim(), new_skill_desc: f.desc.trim() })}><Check size={16} />Simpan</button>
+    <button className="btn bl" disabled={busy || f.name.trim().length < 2} onClick={() => onSave({ new_name: f.name.trim(), new_element: f.el, new_hp: num(f.hp), new_atk: num(f.atk), new_def: num(f.def), new_spd: num(f.spd), new_skill: f.skill.trim(), new_skill_desc: f.desc.trim() })}><Check size={16} />Simpan</button>
   </div>
 }

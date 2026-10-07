@@ -79,7 +79,7 @@ export function Pamer() {
             <div className="pamer-foot">
               {msg && <p className="err">{msg}</p>}
               <button className="btn ln" onClick={close}>Tutup</button>
-              <button className="btn rd" disabled={busy} onClick={save}>{busy ? 'Menyimpan...' : 'Simpan pameran'}</button>
+              <button className="btn bl" disabled={busy} onClick={save}>{busy ? 'Menyimpan...' : 'Simpan pameran'}</button>
             </div>
           </aside>
         </div>
