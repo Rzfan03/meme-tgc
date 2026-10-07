@@ -1,13 +1,13 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { RiBookOpenLine, RiSettings3Line, RiUserLine, RiCameraLine } from 'react-icons/ri'
+import { RiBookOpenLine, RiSettings3Line, RiUserLine, RiCameraLine, RiLogoutBoxLine } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { Pamer } from '@/components/Pamer'
 import { Share } from '@/components/Share'
 import { CardGridSkeleton } from '@/components/Skeleton'
 import { QuestToday } from '@/components/QuestToday'
-import { displayName, useCards, useProfile, useUser } from '@/lib/hooks'
+import { displayName, useCards, useProfile, useSignOut, useUser } from '@/lib/hooks'
 
 const THEMES = [['sistem', 'Sistem'], ['terang', 'Terang'], ['gelap', 'Gelap']] as const
 type Theme = (typeof THEMES)[number][0]
@@ -39,6 +39,7 @@ export default function Account() {
   const { user } = useUser()
   const { profile, reload, save } = useProfile()
   const { cards, loading } = useCards()
+  const signOut = useSignOut()
   const [nick, setNick] = useState(''), [msg, setMsg] = useState(''), [busy, setBusy] = useState(false)
   const [theme, setTheme] = useState<Theme>('sistem'), file = useRef<HTMLInputElement>(null)
   useEffect(() => { const t = (localStorage.getItem(THEME_KEY) as Theme) || 'sistem'; setTheme(t); applyTheme(t) }, [])
@@ -105,6 +106,9 @@ export default function Account() {
         <p className="sub" style={{ margin: 0 }}>Tampilan</p>
         <div className="seg" style={{ marginTop: '.6rem' }}>
           {THEMES.map(([val, label]) => <button key={val} className={`chip${theme === val ? ' on' : ''}`} onClick={() => { setTheme(val); applyTheme(val); localStorage.setItem(THEME_KEY, val) }}>{label}</button>)}
+        </div>
+        <div className="bar" style={{ margin: '1.2rem 0 0' }}>
+          <button className="btn rd" onClick={signOut}><RiLogoutBoxLine size={18} />Keluar</button>
         </div>
       </section>
     </div>
