@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { Home, Library, Sparkles, Swords, Store, Users, LogIn, LogOut, Settings, User } from 'lucide-react'
+import { Home, Library, Search, Sparkles, Swords, Store, Users, LogIn, LogOut, Settings, User } from 'lucide-react'
 import { displayName, useProfile, useSignOut, useUser } from '@/lib/hooks'
 import { bukaArena } from '@/components/ArenaModal'
 import { NotifBell } from '@/components/NotifBell'
@@ -37,6 +37,7 @@ export function Header() {
           </button>
           {open && <div className="menu" role="menu">
             <p className="who">{profile?.nickname ?? displayName(user)}<small>{user.email}</small></p>
+            <Link href="/pemain" role="menuitem" onClick={() => setOpen(false)}><Search size={16} />Cari Pemain</Link>
             <Link href="/account" role="menuitem" onClick={() => setOpen(false)}><User size={16} />Profil</Link>
             <Link href="/account#pengaturan" role="menuitem" onClick={() => setOpen(false)}><Settings size={16} />Pengaturan</Link>
             <button role="menuitem" onClick={signOut}><LogOut size={16} />Keluar</button>

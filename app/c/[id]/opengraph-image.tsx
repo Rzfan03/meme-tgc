@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { ELEMENTS, RARITY_LABEL, type CardData } from '@/lib/game'
+import { ELEMENTS, type CardData } from '@/lib/game'
 import { gambarPng, kartuPublic } from '@/lib/server'
 
 export const runtime = 'nodejs'
@@ -40,7 +40,7 @@ export default async function Og({ params }: { params: Promise<{ id: string }> }
           <div style={{ marginLeft: 18, fontSize: 30, fontWeight: 700, letterSpacing: 5, opacity: 0.6 }}>VERSE</div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.45)', borderRadius: 999, padding: '10px 22px', fontSize: 24, fontWeight: 700, border: `2px solid ${glow}` }}>
             <div style={{ width: 16, height: 16, borderRadius: 999, background: glow, marginRight: 12 }} />
-            <div style={{ fontSize: 24, fontWeight: 800 }}>{c.element + ' · ' + (RARITY_LABEL[c.rarity] ?? c.rarity)}</div>
+            <div style={{ fontSize: 24, fontWeight: 800 }}>{c.element}</div>
           </div>
         </div>
 

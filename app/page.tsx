@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Camera, Sparkles, Swords } from 'lucide-react'
 import { Card } from '@/components/Card'
 import { BOTS, ELEMENTS, BEATS } from '@/lib/game'
-const STEPS = [{ Icon: Camera, t: 'Upload foto', p: 'Pilih gambar, kami kompres otomatis.' }, { Icon: Sparkles, t: 'AI mencetak kartu', p: 'Nama, elemen, rarity, jurus, dan stat dibuat dari isi fotomu.' }, { Icon: Swords, t: 'Adu di arena', p: 'Susun tiga kartu terbaik dan kalahkan lawan.' }]
+const STEPS = [{ Icon: Camera, t: 'Upload foto', p: 'Pilih gambar, kami kompres otomatis.' }, { Icon: Sparkles, t: 'AI mencetak kartu', p: 'Nama, kategori (Holy Card↝Tai ayam), jurus, dan stat dibuat dari isi fotomu.' }, { Icon: Swords, t: 'Adu di arena', p: 'Susun tiga kartu terbaik dan kalahkan lawan.' }]
 export default function Home() {
   return (
     <>

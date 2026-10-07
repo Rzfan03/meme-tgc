@@ -12,12 +12,19 @@ type F = CardData & { max: number; sk?: boolean }
 type B = { id: string; p1: string; p2: string | null; p2_cards: F[] | null; p1_cards: F[]; p1_active: number; p2_active: number; turn: string | null; status: 'waiting' | 'active' | 'done'; winner: string | null; log: string[] }
 export default function Versus() {
   const { user, ready, cards, loading } = useCards()
-  const [sel, setSel] = useState<string[]>([]), [bid, setBid] = useState<string | null>(null), [b, setB] = useState<B | null>(null), [err, setErr] = useState(''), [opp, setOpp] = useState(false)
+  const [sel, setSel] = useState<string[]>([]), [bid, setBid] = useState<string | null>(null), [b, setB] = useState<B | null>(null), [err, setErr] = useState(''), [opp, setOpp] = useState(false), [names, setNames] = useState<Record<string, string>>({})
   useEffect(() => { const q = new URLSearchParams(location.search).get('b'); if (q) setBid(q) }, [])
   useEffect(() => {
     if (!bid) return
-    supabase.from('battles').select('*').eq('id', bid).single().then(({ data }) => data && setB(data as B))
-    const ch = supabase.channel('battle-' + bid, { config: { presence: { key: user?.id ?? 'anon' } } }).on('postgres_changes', { event: '*', schema: 'public', table: 'battles', filter: `id=eq.${bid}` }, p => setB(p.new as B)).on('presence', { event: 'sync' }, () => setOpp(Object.keys(ch.presenceState()).length > 1)).subscribe(s => { if (s === 'SUBSCRIBED') ch.track({ at: Date.now() }) })
+    const load = async () => {
+      const { data } = await supabase.from('battles').select('*').eq('id', bid).single()
+      if (!data) return
+      setB(data as B)
+      const { data: profs } = await supabase.from('profiles').select('id,nickname').in('id', [data.p1, data.p2].filter(Boolean))
+      setNames(Object.fromEntries((profs ?? []).map((x: { id: string; nickname: string }) => [x.id, x.nickname])))
+    }
+    void load()
+    const ch = supabase.channel('battle-' + bid, { config: { presence: { key: user?.id ?? 'anon' } } }).on('postgres_changes', { event: '*', schema: 'public', table: 'battles', filter: `id=eq.${bid}` }, p => { if (p.new) setB(p.new as B); else setB(prev => prev ? { ...prev, status: 'done', log: [...prev.log, 'Battle dihapus, kedua pemain tidak aktif.'] } : null) }).on('presence', { event: 'sync' }, () => setOpp(Object.keys(ch.presenceState()).length > 1)).subscribe(s => { if (s === 'SUBSCRIBED') ch.track({ at: Date.now() }) })
     return () => { supabase.removeChannel(ch) }
   }, [bid])
   useEffect(() => {
@@ -43,9 +50,9 @@ export default function Versus() {
   const aktif = mine[mi], skReady = aktif.sk !== false
   return (
     <div className="w page"><div className="pagehead"><h2>Versus</h2></div>
-      <div className="tray">{foe.map((c, i) => mini(c, i, fi, false))}</div>
+      <div className="tray"><small className="pn">{names[me ? b.p2! : b.p1] ?? (me ? 'Pemain 2' : 'Pemain 1')}</small>{foe.map((c, i) => mini(c, i, fi, false))}</div>
       <div className="field">{fg(foe[fi])}<div className="vs d">VS</div>{fg(mine[mi])}</div>
-      <div className="tray">{mine.map((c, i) => mini(c, i, mi, true))}</div>
+      <div className="tray">{mine.map((c, i) => mini(c, i, mi, true))}<small className="pn">{names[me ? b.p1 : b.p2!] ?? (me ? 'Pemain 1' : 'Pemain 2')}</small></div>
       <p className="turn">{b.status === 'done' ? (spectator ? 'Pertarungan selesai.' : b.winner === user!.id ? 'Kamu menang!' : 'Kamu kalah. Coba lagi!') : spectator ? 'Menonton pertarungan...' : myTurn ? 'Giliranmu. Serang, pakai skill, atau ketuk kartu untuk ganti.' : 'Menunggu lawan...'}{b.status === 'active' && <small> ({opp ? 'lawan online' : 'lawan offline'})</small>}</p>
       {spectator && !myTurn && <p className="sub" style={{ textAlign: 'center' }}><Eye size={14} /> Kamu menonton sebagai spectator.</p>}
       <div style={{ display: 'flex', gap: '.7rem', justifyContent: 'center' }}>

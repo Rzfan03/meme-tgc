@@ -8,16 +8,16 @@ import { useProfile, useUser } from '@/lib/hooks'
 import { supabase } from '@/lib/supabase'
 import { sfx } from '@/lib/sound'
 import { toastSuccess } from '@/lib/alert'
-import { ELEMENTS, RARITY_LABEL, type CardData, type El, type Rarity } from '@/lib/game'
+import { ELEMENTS, type CardData, type El } from '@/lib/game'
 
 type L = {
   id: string; card_id: string; price: number; created_at: string
   seller_nickname: string; seller_avatar: string | null
-  name: string; element: string; rarity: string; hp: number; atk: number; def: number; spd: number
+  name: string; element: string; hp: number; atk: number; def: number; spd: number
   skill: string; skill_desc: string; hue: number; image_url: string | null
 }
 
-const toCard = (l: L): CardData => ({ id: l.card_id, name: l.name, element: l.element as El, rarity: l.rarity as Rarity, hp: l.hp, atk: l.atk, def: l.def, spd: l.spd, skill: l.skill, skill_desc: l.skill_desc, hue: l.hue, image_url: l.image_url })
+const toCard = (l: L): CardData => ({ id: l.card_id, name: l.name, element: l.element as El, hp: l.hp, atk: l.atk, def: l.def, spd: l.spd, skill: l.skill, skill_desc: l.skill_desc, hue: l.hue, image_url: l.image_url })
 
 export default function Market() {
   const { user, ready } = useUser()
@@ -117,7 +117,7 @@ export default function Market() {
               : shown.length ? shown.map(l => (
                 <div key={l.id} className="p-card">
                   <div className="p-stage" style={{ '--elm': ELEMENTS[l.element as El] } as React.CSSProperties}>
-                    <span className={`p-badge ${l.rarity}`}>{RARITY_LABEL[l.rarity as Rarity]}</span>
+                    <span className="p-badge" style={{ background: ELEMENTS[l.element as El] }}>{l.element}</span>
                     <button className={`p-heart${wish.has(l.id) ? ' on' : ''}`} onClick={() => toggleWish(l.id)} aria-pressed={wish.has(l.id)} aria-label={wish.has(l.id) ? 'Hapus dari wishlist' : 'Simpan ke wishlist'}><Heart size={17} strokeWidth={2.4} /></button>
                     <Link href={`/c/${l.card_id}`} className="kt-link"><Card c={toCard(l)} /></Link>
                   </div>
@@ -145,7 +145,7 @@ export default function Market() {
           <div className="buy-card">
             <Card c={toCard(buy)} w={118} />
             <div className="buy-card-info">
-              <span className={`rdot ${buy.rarity}`} style={{ marginBottom: '.2rem' }} />
+              <span className="rdot" style={{ background: ELEMENTS[buy.element as El], marginBottom: '.2rem', boxShadow: `0 0 6px ${ELEMENTS[buy.element as El]}` }} />
               <b>{buy.name}</b>
               <small>{buy.seller_nickname}</small>
               <small><Coins size={11} style={{ verticalAlign: -1 }} /> {buy.price.toLocaleString('id-ID')} poin</small>

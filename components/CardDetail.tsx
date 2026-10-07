@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Store, X } from 'lucide-react'
 import { Card } from '@/components/Card'
 import { Share } from '@/components/Share'
-import { ELEMENTS, RARITY_LABEL, type CardData } from '@/lib/game'
+import { ELEMENTS, type CardData } from '@/lib/game'
 import { supabase } from '@/lib/supabase'
 import { sfx } from '@/lib/sound'
 
@@ -69,7 +69,7 @@ export function CardDetail({ c, onClose }: { c: CardData | null; onClose: () => 
         <div className="cd-card"><Card c={c} /></div>
 
         <div className="cd-info">
-          <span className="rar-cap">{RARITY_LABEL[c.rarity]}</span>
+          <span className="rar-cap">{c.element}</span>
           <h3>{c.name}</h3>
           <span className="cd-el" style={{ color: glow, borderColor: glow }}><i />{c.element}</span>
 

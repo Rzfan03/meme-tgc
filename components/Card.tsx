@@ -1,12 +1,13 @@
 'use client'
 import { useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
-import { ELEMENTS, RARITY_LABEL, type CardData } from '@/lib/game'
+import { ELEMENTS, type CardData } from '@/lib/game'
 
-const RARITIES = {
-  common: { frame: 'linear-gradient(145deg,#9aa3ad,#59616b 50%,#aab2bb)', foil: 0 },
-  rare: { frame: 'linear-gradient(145deg,#8fd0ff,#2f6fb5 50%,#9fd8ff)', foil: .35 },
-  epic: { frame: 'linear-gradient(145deg,#e0a6ff,#7a3fb8 50%,#f0c4ff)', foil: .55 },
-  legendary: { frame: 'linear-gradient(145deg,#fff0a8,#c8901c 45%,#fff3b8 70%,#b5760f)', foil: .8 },
+const FRAMES = {
+  'Holy Card': { frame: 'linear-gradient(145deg,#fff0a8,#c8901c 45%,#fff3b8 70%,#b5760f)', foil: .8 },
+  Chaoz: { frame: 'linear-gradient(145deg,#e6d2ff,#8a4fd8 45%,#f0e0ff 70%,#b5760f)', foil: .55 },
+  Mogger: { frame: 'linear-gradient(145deg,#c9f7da,#2ea85f 45%,#ddfbee 70%,#1a7a40)', foil: .35 },
+  Sampah: { frame: 'linear-gradient(145deg,#ecd6be,#9c6b33 45%,#f5e5cf 70%,#6f4a1f)', foil: .15 },
+  'Tai ayam': { frame: 'linear-gradient(145deg,#d7dade,#7d838c 50%,#e2e5e9)', foil: 0 },
 } as const
 
 const STATS = [
@@ -20,7 +21,7 @@ const GLOW: Record<string, 'rainbow' | 'color' | 'none'> = { 'Holy Card': 'rainb
 
 export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boolean; w?: number; onClick?: () => void }) {
   const ref = useRef<HTMLElement>(null)
-  const rar = RARITIES[c.rarity] ?? RARITIES.common
+  const fr = FRAMES[c.element] ?? FRAMES['Tai ayam']
   const glow = ELEMENTS[c.element] ?? '#8B5CF6'
   const holy = GLOW[c.element] === 'rainbow'
 
@@ -47,8 +48,8 @@ export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boole
     '--c1': 'color-mix(in srgb, ' + glow + ' 26%, #070A1E)',
     '--c2': glow,
     '--glow': glow,
-    '--frame': rar.frame,
-    '--foil': holy ? 1 : rar.foil,
+    '--frame': fr.frame,
+    '--foil': holy ? 1 : fr.foil,
   } as CSSProperties
 
   const v = c as unknown as Record<string, number>
@@ -61,7 +62,7 @@ export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boole
         data-glow={GLOW[c.element] ?? 'color'}
         style={vars}
         tabIndex={0}
-        aria-label={`${c.name}, ${RARITY_LABEL[c.rarity]}, element ${c.element}, HP ${c.hp}, ATK ${c.atk}, DEF ${c.def}, SPD ${c.spd}`}
+        aria-label={`${c.name}, kategori ${c.element}, HP ${c.hp}, ATK ${c.atk}, DEF ${c.def}, SPD ${c.spd}`}
         onPointerMove={move}
         onPointerLeave={leave}
         onBlur={leave}
@@ -82,7 +83,7 @@ export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boole
 
           <div className="tcg-type">
             <span className="tcg-cat"><i className="tcg-dot" />{c.element}</span>
-            <span className="tcg-rar">{RARITY_LABEL[c.rarity]}</span>
+            <span className="tcg-rar">{c.element}</span>
           </div>
 
           <div className="tcg-ability">
@@ -98,7 +99,7 @@ export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boole
             ))}
           </div>
         </div>
-        {rar.foil > 0 && <div className="tcg-foil" aria-hidden />}
+        {fr.foil > 0 && <div className="tcg-foil" aria-hidden />}
       </article>
     </div>
   )

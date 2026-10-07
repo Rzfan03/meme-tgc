@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Card } from '@/components/Card'
 import { Share } from '@/components/Share'
-import { ELEMENTS, RARITY_LABEL, type CardData } from '@/lib/game'
+import { ELEMENTS, type CardData } from '@/lib/game'
 import { kartuPublic, pemilikPublic } from '@/lib/server'
 
 export const dynamic = 'force-dynamic'
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const c = (await kartuPublic(id)) as Publik | null
   if (!c) return { title: 'Kartu tidak ditemukan · MultiVerse' }
 
-  const desc = `${RARITY_LABEL[c.rarity]} · Element ${c.element} · ${c.skill}: ${c.skill_desc} (HP ${c.hp} · ATK ${c.atk} · DEF ${c.def} · SPD ${c.spd})`
+  const desc = `${c.element} · ${c.skill}: ${c.skill_desc} (HP ${c.hp} · ATK ${c.atk} · DEF ${c.def} · SPD ${c.spd})`
   const judul = `${c.name} · MultiVerse`
   return {
     title: judul,
@@ -53,7 +53,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <Card c={c} />
         <div className="panel sharepanel">
           <div>
-            <span className="rar-cap">{RARITY_LABEL[c.rarity]}</span>
+            <span className="rar-cap">{c.element}</span>
             <h1>{c.name}</h1>
           </div>
 

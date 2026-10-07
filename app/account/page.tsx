@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Library, Settings, User, Camera } from 'lucide-react'
+import { Library, Search, Settings, User, Camera } from 'lucide-react'
 import { Card } from '@/components/Card'
 import { Pamer } from '@/components/Pamer'
 import { Share } from '@/components/Share'
@@ -70,6 +70,7 @@ export default function Account() {
         </div>
         <div className="bar" style={{ margin: '1rem 0 0' }}>
           <Link href={`/p/${user.id}`} className="btn ln"><User size={18} />Halaman profil publik</Link>
+          <Link href="/pemain" className="btn ln"><Search size={18} />Cari pemain</Link>
           <Pamer />
           <Share path={`/p/${user.id}`} title={`Profil ${profile?.nickname ?? displayName(user)} · MultiVerse`}>Bagikan profil</Share>
         </div>

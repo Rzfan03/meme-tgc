@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createHash } from 'crypto'
-import { ELEMENTS, BUDGET, DAILY_LIMIT, rarityFromHash, type El } from '@/lib/game'
+import { DAILY_LIMIT, kategoriDariStat, type El } from '@/lib/game'
 export const runtime = 'nodejs'
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 const BUCKET = process.env.SUPABASE_BUCKET ?? 'kartuku-cards'
@@ -11,18 +11,18 @@ const OR_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
 const err = (m: string, s: number) => NextResponse.json({ error: m }, { status: s })
 const PROMPT = `Kamu desainer stat kartu game. Dari NAMA karakter yang diberikan, buat kartu sesuai kemampuan aslinya, dengan stat yang ADIL, PRESISI, dan seimbang.
-Balas HANYA JSON: {"safe":boolean,"element":"${Object.keys(ELEMENTS).join('|')}","skill":string (maks 3 kata),"skill_desc":string (maks 12 kata, bahasa Indonesia),"weights":{"hp":1-9,"atk":1-9,"def":1-9,"spd":1-9}}.
+Balas HANYA JSON: {"safe":boolean,"skill":string (maks 3 kata),"skill_desc":string (maks 12 kata, bahasa Indonesia),"weights":{"hp":1-9,"atk":1-9,"def":1-9,"spd":1-9}}.
 Aturan PENAKARAN STAT (paling penting):
-- weights harus TOTAL PERSIS 24, masing-masing antara 1 dan 9.
-- Bagikan 24 poin proporsional kemampuan nyata. Jangan menang semuanya ke atk: keseimbangan hp/def (bertahan) melawan atk/spd (menyerang) harus masuk akal.
+- weights menentukan KUAT/LEMAHNYA kartu. Total weights menentukan kategori: Tai ayam/Sampah untuk kartu lemah, Mogger/Chaoz untuk menengah, Holy Card hanya untuk karakter sangat kuat dengan semua stat besar dan SEIMBANG.
+- Masing-masing weights antara 1 dan 9. Total anything dari 16 (kartu lemah) sampai 24 (kartu sangat kuat) — SESUAIKAN total dengan seberapa kuat karakter itu seharusnya. Jangan ratakan semua 6 supaya semua jadi Holy Card.
+- Bagikan poin proporsional kemampuan nyata. Keseimbangan hp/def (bertahan) melawan atk/spd (menyerang) harus masuk akal.
 - Glosarium: hp = ketahanan, atk = serangan, def = pertahanan, spd = kecepatan.
-- Contoh skala yang adil per arketipe (total 24):
+- Contoh skala yang adil (total 24):
   • Tank: hp 8, def 8, atk 4, spd 4.
   • Glass cannon: atk 8, spd 8, hp 5, def 3.
   • Seimbang: hp 6, atk 6, def 6, spd 6.
 - Kalau karakter dikenal, teliti kemampuan kanoniknya dan sesuaikan. Contoh: "Ichigo Kurosaki" (Bleach) = Bankai, pedang Zangetsu, regenerasi cepat → condong atk+spd, misal hp 6, atk 7, def 5, spd 6.
 - Kalau nama tidak dikenal atau bukan tokoh, buat stat masuk akal sesuai nama.
-- JANGAN memakai total di atas 24 dan jangan rata-rata 6 ke atas untuk semua. Variasikan antar arketipe; kartu lemah boleh total rendah (misal 18-20).
 - "safe" false hanya jika nama berisi konten seksual eksplisit, ujaran kebencian, atau pelecehan anak.`
 
 export async function POST(req: NextRequest) {
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   if (raw instanceof File && raw.size > 1_500_000) return err('Foto terlalu besar. Maksimal 1,5 MB.', 413)
   const f = raw instanceof File && raw.type.startsWith('image/') && raw.size > 0 ? raw : null
 
-  // nama menentukan rarity/warna; foto (kalau ada) menentukan hash unik
+  // nama menentukan hash unik; foto (kalau ada) juga
   const hash = createHash('sha256').update((f ? Buffer.from(await f.arrayBuffer()) : name.toLowerCase())).digest('hex')
   const day = new Date(); day.setUTCHours(0, 0, 0, 0)
   const { count } = await sb.from('cards').select('id', { count: 'exact', head: true }).eq('user_id', userId).gte('created_at', day.toISOString())
@@ -73,15 +73,12 @@ export async function POST(req: NextRequest) {
   if (!a) return err('AI sedang sibuk, coba lagi nanti.', 502)
   if (a.safe === false) return err('Nama kartu ini tidak bisa dipakai.', 422)
 
-  const els = Object.keys(ELEMENTS) as El[]
-  const rarity = rarityFromHash(hash)
   const w = ['hp', 'atk', 'def', 'spd'].map(k => Math.min(10, Math.max(1, Number(a.weights?.[k]) || 5)))
-  const sum = w.reduce((x, y) => x + y)
-  const v = w.map(x => Math.round((x / sum) * BUDGET[rarity]))
+  // Skala tetap: stat ~ weight*7, hp diberi +30 sehingga total baik antar 1-9.
+  const v = w.map(x => x * 7)
   const hp = v[0] + 30
   const atk = v[1], def = v[2], spd = v[3]
-  // Karakter kuat (HP & semua stat gede) otomatis jadi Holy Card
-  const element: El = hp >= 55 && atk >= 10 && def >= 10 && spd >= 10 ? 'Holy Card' : els.includes(a.element) ? a.element : els[parseInt(hash.slice(8, 10), 16) % els.length]
+  const element: El = kategoriDariStat(hp, atk, def, spd)
 
   let image_url = ''
   if (f) {
@@ -93,7 +90,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { data, error } = await sb.from('cards').insert({
-    user_id: userId, image_hash: hash, image_url, name, element, rarity,
+    user_id: userId, image_hash: hash, image_url, name, element, rarity: element,
     hp, atk, def, spd,
     skill: String(a.skill || 'Serangan Biasa').slice(0, 40),
     skill_desc: String(a.skill_desc || '').slice(0, 100),

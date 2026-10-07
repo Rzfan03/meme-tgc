@@ -78,6 +78,9 @@
   .panel { @apply mb-6 rounded-[22px] bg-sf p-6; box-shadow: var(--sh); scroll-margin-top: 90px; }
   .panel h3 { @apply mb-4 flex items-center gap-2.5; }
   .row { @apply flex flex-wrap items-center gap-4; }
+  .list { display: grid; gap: .6rem; }
+  .list .row { padding: .7rem .9rem; background: var(--sf); border: 1px solid var(--ln); border-radius: 16px; transition: border-color .15s, transform .15s; }
+  .list .row:hover { border-color: var(--ac); transform: translateY(-1px); }
   .row .stat { @apply grid min-w-[92px] gap-px rounded-[14px] bg-bg p-3; }
   .row .stat b { @apply font-display text-2xl; }
   .row .stat small { @apply text-[.78rem] text-mut; }
@@ -151,7 +154,8 @@
   .hp div { height: 100%; background: var(--mn); transition: width .4s; }
   .dmg { position: absolute; top: 30%; font: 800 2.2rem 'Bricolage Grotesque', sans-serif; color: var(--yl); text-shadow: 0 2px 0 #000; animation: up .8s forwards; z-index: 5; }
   .hit { animation: hit .35s; }
-  .tray { @apply flex flex-wrap justify-center gap-3; margin: .9rem 0; }
+  .tray { @apply flex flex-wrap justify-center gap-3 items-center; margin: .9rem 0; }
+  .tray .pn { flex: 0 0 100%; text-align: center; font-size: .8rem; font-weight: 700; color: var(--mut); }
   .mini { width: 78px; aspect-ratio: 5/7; border-radius: 10px; background: hsl(var(--h) 80% 62%); display: grid; place-items: center; font-size: 1.8rem; position: relative; opacity: .7; box-shadow: var(--sh); overflow: hidden; }
   .mini img { width: 100%; height: 100%; object-fit: cover; }
   .mini small { position: absolute; bottom: 2px; font-size: .6rem; font-weight: 700; background: #0E1240; color: #fff; border-radius: 99px; padding: 0 .4rem; }
@@ -265,10 +269,6 @@
   .mkt-reset:hover { text-decoration: underline; }
   .sw { width: 12px; height: 12px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
   .rdot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-  .rdot.common { background: #9aa3ad; }
-  .rdot.rare { background: #4a90d9; box-shadow: 0 0 6px #4a90d9; }
-  .rdot.epic { background: #a06bdc; box-shadow: 0 0 6px #a06bdc; }
-  .rdot.legendary { background: #e0a12b; box-shadow: 0 0 8px #e0a12b; }
   .mkt-main { min-width: 0; }
   .mkt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
   .p-card { display: grid; gap: .7rem; align-content: start; background: var(--sf); border: 1px solid var(--ln); border-radius: 22px; padding: .55rem .55rem .85rem; box-shadow: var(--sh); transition: transform .15s, box-shadow .15s; }
