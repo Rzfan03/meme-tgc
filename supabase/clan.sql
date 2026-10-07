@@ -1,5 +1,5 @@
 -- Clan: tag pendek (2-5 karakter) + nama. Tag tampil sebagai prefix nama saat battle: "BTR Rzfan03".
--- Jalankan SETELAH profiles.sql & admin.sql (create_clan/join_clan memakai cek_ban).
+-- Jalankan SETELAH profiles.sql & admin.sql (create_clan/request_join memakai cek_ban).
 
 create table if not exists public.clans(
   id uuid primary key default gen_random_uuid(),
@@ -19,6 +19,22 @@ create index if not exists profiles_clan_idx on public.profiles(clan_id);
 -- role: leader = clans.leader_id, wakil = clans.vice_id, sisanya anggota
 alter table public.clans add column if not exists vice_id uuid references public.profiles(id) on delete set null;
 
+-- permintaan gabung: member baru harus di-acc ketua/wakil dulu
+create table if not exists public.clan_requests(
+  id uuid primary key default gen_random_uuid(),
+  clan_id uuid not null references public.clans(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (clan_id, user_id));
+alter table public.clan_requests enable row level security;
+-- baca saja untuk pemohon & pengurus clan; insert/hapus lewat RPC security definer
+drop policy if exists "request terbaca pemohon & pengurus" on public.clan_requests;
+create policy "request terbaca pemohon & pengurus" on public.clan_requests for select
+  using (user_id = auth.uid()
+      or clan_id in (select id from clans where leader_id = auth.uid() or vice_id = auth.uid()));
+create index if not exists clan_requests_clan_idx on public.clan_requests(clan_id);
+create index if not exists clan_requests_user_idx on public.clan_requests(user_id);
+
 -- buat clan: pemain jadi ketua sekaligus anggota pertama
 create or replace function public.create_clan(clan_name text, clan_tag text) returns uuid
 language plpgsql security definer set search_path=public as $$
@@ -34,6 +50,7 @@ begin
   if exists(select 1 from clans where tag = t) then raise exception 'Tag sudah dipakai clan lain'; end if;
   insert into clans(name, tag, leader_id) values (nm, t, uid) returning id into cid;
   update profiles set clan_id = cid where id = uid;
+  delete from clan_requests where user_id = uid;
   return cid;
 end $$;
 
@@ -46,10 +63,10 @@ begin
   end if;
 end $$;
 
--- gabung clan via tag publik
-create or replace function public.join_clan(clan_tag text) returns uuid
+-- ajukan permintaan gabung via tag (belum langsung masuk, nunggu acc)
+create or replace function public.request_join(clan_tag text) returns uuid
 language plpgsql security definer set search_path=public as $$
-declare uid uuid := auth.uid(); t text; cid uuid;
+declare uid uuid := auth.uid(); t text; cid uuid; rid uuid;
 begin
   perform public.cek_ban();
   if uid is null then raise exception 'Masuk dulu'; end if;
@@ -57,10 +74,58 @@ begin
   select id into cid from clans where tag = t;
   if cid is null then raise exception 'Clan tidak ditemukan'; end if;
   if exists(select 1 from profiles where id = uid and clan_id is not null) then raise exception 'Kamu sudah punya clan'; end if;
+  if exists(select 1 from clan_requests where user_id = uid) then raise exception 'Kamu sudah punya permintaan menunggu acc'; end if;
   perform public.clan_penuh(cid);
-  update profiles set clan_id = cid where id = uid;
-  return cid;
+  insert into clan_requests(clan_id, user_id) values (cid, uid) returning id into rid;
+  return rid;
 end $$;
+
+-- ketua/wakil menerima permintaan: pemohon resmi jadi anggota
+create or replace function public.approve_join(req_id uuid) returns void
+language plpgsql security definer set search_path=public as $$
+declare uid uuid := auth.uid(); cid uuid; tid uuid;
+begin
+  perform public.cek_ban();
+  if uid is null then raise exception 'Masuk dulu'; end if;
+  select clan_id, user_id into cid, tid from clan_requests where id = req_id;
+  if cid is null then raise exception 'Permintaan tidak ditemukan'; end if;
+  if not exists(select 1 from clans where id = cid and (leader_id = uid or vice_id = uid)) then
+    raise exception 'Hanya ketua/wakil yang bisa menerima permintaan';
+  end if;
+  perform public.clan_penuh(cid);
+  if exists(select 1 from profiles where id = tid and clan_id is not null) then raise exception 'Pemain sudah punya clan lain'; end if;
+  update profiles set clan_id = cid where id = tid;
+  delete from clan_requests where user_id = tid;
+end $$;
+
+-- ketua/wakil menolak permintaan
+create or replace function public.reject_join(req_id uuid) returns void
+language plpgsql security definer set search_path=public as $$
+declare uid uuid := auth.uid(); cid uuid;
+begin
+  if uid is null then raise exception 'Masuk dulu'; end if;
+  select clan_id into cid from clan_requests where id = req_id;
+  if cid is null then raise exception 'Permintaan tidak ditemukan'; end if;
+  if not exists(select 1 from clans where id = cid and (leader_id = uid or vice_id = uid)) then
+    raise exception 'Hanya ketua/wakil yang bisa menolak permintaan';
+  end if;
+  delete from clan_requests where id = req_id;
+end $$;
+
+-- pemohon membatalkan permintaannya sendiri
+create or replace function public.cancel_join(req_id uuid) returns void
+language plpgsql security definer set search_path=public as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then raise exception 'Masuk dulu'; end if;
+  if not exists(select 1 from clan_requests where id = req_id and user_id = uid) then
+    raise exception 'Permintaan tidak ditemukan';
+  end if;
+  delete from clan_requests where id = req_id;
+end $$;
+
+-- join langsung sudah tidak ada: semua jalur lewat request_join + approve_join
+drop function if exists public.join_clan(text);
 
 -- keluar clan. Kalau ketua keluar: wakil otomatis jadi ketua, kalau tidak ada
 -- wakil pindah ke anggota terlama. Wakil yang keluar otomatis dicopot.
@@ -120,10 +185,11 @@ begin
   if exists(select 1 from profiles where id = tid and clan_id = cid) then raise exception 'Sudah anggota clan kamu'; end if;
   if exists(select 1 from profiles where id = tid and clan_id is not null) then raise exception 'Pemain sudah punya clan lain'; end if;
   update profiles set clan_id = cid where id = tid;
+  delete from clan_requests where user_id = tid;
   return tid;
 end $$;
 
 -- clan_penuh hanya dipanggil internal fungsi lain, jadi tidak di-grant ke klien
 revoke all on function public.clan_penuh(uuid) from public, anon, authenticated;
-revoke all on function public.create_clan(text, text), public.join_clan(text), public.leave_clan(), public.set_vice(uuid), public.add_member(text) from public, anon;
-grant execute on function public.create_clan(text, text), public.join_clan(text), public.leave_clan(), public.set_vice(uuid), public.add_member(text) to authenticated;
+revoke all on function public.create_clan(text, text), public.request_join(text), public.approve_join(uuid), public.reject_join(uuid), public.cancel_join(uuid), public.leave_clan(), public.set_vice(uuid), public.add_member(text) from public, anon;
+grant execute on function public.create_clan(text, text), public.request_join(text), public.approve_join(uuid), public.reject_join(uuid), public.cancel_join(uuid), public.leave_clan(), public.set_vice(uuid), public.add_member(text) to authenticated;

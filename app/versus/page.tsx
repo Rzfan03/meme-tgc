@@ -23,8 +23,15 @@ export default function Versus() {
   useEffect(() => {
     if (!bid) return
     const load = async () => {
-      const { data } = await supabase.from('battles').select('*').eq('id', bid).single()
-      if (!data) return
+      const { data, error } = await supabase.from('battles').select('*').eq('id', bid).single()
+      if (!data) {
+        if (error?.code === 'PGRST116') {
+          setErr('Battle sudah tidak ada (berakhir atau dihapus).')
+          setBid(null)
+          history.replaceState(null, '', location.pathname)
+        }
+        return
+      }
       setB(data as B)
       const { data: profs } = await supabase.from('profiles').select('id,nickname,clans(tag)').in('id', [data.p1, data.p2].filter(Boolean))
       // embed clans bisa berupa objek (many-to-one) atau array, tergantung inferensi PostgREST
@@ -36,7 +43,10 @@ export default function Versus() {
     void load()
     const ch = supabase.channel('battle-' + bid, { config: { presence: { key: user?.id ?? 'anon' } } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'battles', filter: `id=eq.${bid}` }, p => {
-        if (p.new) setB(p.new as B)
+        // event DELETE datang dengan p.new = {} (truthy tapi kosong) — wajib dicek id-nya,
+        // kalau tidak, state jadi {} dan layar loncat ke "Mencari lawan…"
+        const n = p.new as Partial<B> | null
+        if (n && n.id) setB(n as B)
         else setB(prev => prev ? { ...prev, status: 'done', log: [...prev.log, 'Battle dihapus, kedua pemain tidak aktif.'] } : null)
       })
       .on('presence', { event: 'sync' }, () => {
@@ -59,7 +69,11 @@ export default function Versus() {
     const { data, error } = await supabase.rpc('find_match', { card_ids: sel })
     setFinding(false)
     if (error) setErr(error.message)
-    else setBid(data)
+    else {
+      setBid(data)
+      // simpan di URL juga — kalau halaman crash/reload, balik ke battle yang sama, bukan lobby
+      history.replaceState(null, '', '?b=' + data)
+    }
   }
   const act = async (a: string, i = 0) => {
     if (a === 'attack') sfx('attack')
@@ -68,6 +82,10 @@ export default function Versus() {
     setErr(error?.message ?? '')
   }
   const toggle = (id: string) => setSel(s => s.includes(id) ? s.filter(x => x !== id) : s.length < 3 ? [...s, id] : s)
+  const reset = () => {
+    setBid(null); setB(null); setSel([])
+    history.replaceState(null, '', location.pathname)
+  }
 
   /* ── Not logged in ── */
   if (ready && !user) return (
@@ -91,7 +109,7 @@ export default function Versus() {
   )
 
   /* ── Waiting for opponent ── */
-  if (bid && b && (b.status === 'waiting' || !b.p1_cards || !b.p2_cards)) return (
+  if (bid && b && (b.status === 'waiting' || !b.p1_cards?.length || !b.p2_cards?.length)) return (
     <div className="w page" style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}>
       <div style={{ textAlign: 'center', display: 'grid', gap: '1.2rem', justifyItems: 'center', maxWidth: 360 }}>
         <div style={{ position: 'relative', width: 72, height: 72 }}>
@@ -120,7 +138,7 @@ export default function Versus() {
             ))}
           </div>
         )}
-        <button className="btn ln" onClick={async () => { await supabase.rpc('cancel_room', { room_id: bid }); setBid(null); setB(null) }}>
+        <button className="btn ln" onClick={async () => { await supabase.rpc('cancel_room', { room_id: bid }); reset() }}>
           Batalkan pencarian
         </button>
       </div>
@@ -134,8 +152,9 @@ export default function Versus() {
     const me = b.p1 === user!.id
     const mine = me ? b.p1_cards! : b.p2_cards!
     const foe = me ? b.p2_cards! : b.p1_cards!
-    const mi = me ? b.p1_active : b.p2_active
-    const fi = me ? b.p2_active : b.p1_active
+    // clamp index aktif ke rentang kartu — baris korup bikin mine[mi] undefined → crash render
+    const mi = Math.max(0, Math.min(me ? b.p1_active : b.p2_active, mine.length - 1))
+    const fi = Math.max(0, Math.min(me ? b.p2_active : b.p1_active, foe.length - 1))
     const myTurn = !spectator && b.turn === user!.id && b.status === 'active'
     const aktif = mine[mi]
     const skReady = aktif.sk !== false
@@ -212,18 +231,18 @@ export default function Versus() {
             </>
           )}
           {b.status === 'done' && !spectator && (
-            <button className="btn ln" onClick={() => { setBid(null); setB(null); setSel([]) }}>
+            <button className="btn ln" onClick={reset}>
               <RiRefreshLine size={18} />Main lagi
             </button>
           )}
           {spectator && (
-            <button className="btn ln" onClick={() => { setBid(null); setB(null); setSel([]) }}>
+            <button className="btn ln" onClick={reset}>
               <RiRefreshLine size={18} />Tutup
             </button>
           )}
         </div>
         {err && <p className="err">{err}</p>}
-        <div className="log">{b.log.slice(-4).map((l, i) => <p key={i}>{l}</p>)}</div>
+        <div className="log">{(b.log ?? []).slice(-4).map((l, i) => <p key={i}>{l}</p>)}</div>
       </div>
     )
   }

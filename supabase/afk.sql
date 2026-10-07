@@ -1,5 +1,7 @@
 -- Bersihkan battle yang menggantung (AFK): hapus active battle yang
--- tidak ada aktivitas > 5 menit. Jalankan SETELAH skill.sql & rooms.sql
+-- tidak ada aktivitas > 30 menit. 30 menit supaya giliran lambat /
+-- app di-background tidak bikin battle aktif ikut terhapus di tengah match.
+-- Jalankan SETELAH skill.sql & rooms.sql
 -- (file ini recreate find_match, join_room, battle_action, list_rooms,
 -- jadi harus memuat semua logika tepa dari versi sebelumnya).
 
@@ -8,7 +10,7 @@ language plpgsql security definer set search_path=public as $$
 declare n int;
 begin
   -- pakai CTE: deleting...returning into (tanpa CTE) error kalau menghapus >1 baris
-  with del as (delete from battles where status='active' and updated_at < now()-interval '5 minutes' returning id)
+  with del as (delete from battles where status='active' and updated_at < now()-interval '30 minutes' returning id)
   select count(*) into n from del;
   if n > 0 then raise notice 'afk_cleanup: % battle dihapus', n; end if;
 end $$;
