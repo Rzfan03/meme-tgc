@@ -7,7 +7,9 @@ create or replace function public.afk_cleanup() returns void
 language plpgsql security definer set search_path=public as $$
 declare n int;
 begin
-  delete from battles where status='active' and updated_at < now()-interval '5 minutes' returning id into n;
+  -- pakai CTE: deleting...returning into (tanpa CTE) error kalau menghapus >1 baris
+  with del as (delete from battles where status='active' and updated_at < now()-interval '5 minutes' returning id)
+  select count(*) into n from del;
   if n > 0 then raise notice 'afk_cleanup: % battle dihapus', n; end if;
 end $$;
 revoke all on function public.afk_cleanup from public, anon;
