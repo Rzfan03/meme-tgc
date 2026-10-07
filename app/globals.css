@@ -133,6 +133,7 @@
   .dlg-head h3 { margin: 0; font-size: 1.1rem; }
   .dlg .btn.rd { background: var(--ac); }
   .x { position: absolute; right: .8rem; top: .6rem; background: none; border: 0; font-size: 1.6rem; }
+  .mb { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.5rem; max-width: 720px; max-height: 92vh; overflow: auto; background: var(--sf); border-radius: 22px; padding: 1.5rem; }
   .mb.buy { grid-template-columns: 1fr; gap: 1rem; max-width: 440px; width: 100%; padding: 1.5rem; }
   .mb p { color: var(--mut); margin: .5rem 0; }
   .x { position: absolute; right: .8rem; top: .6rem; background: none; border: 0; font-size: 1.6rem; }
