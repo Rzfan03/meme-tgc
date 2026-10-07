@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Eye, Loader2, RotateCcw, Swords, Users } from 'lucide-react'
 import Link from 'next/link'
 import { Card } from '@/components/Card'
+import { DeckBar } from '@/components/DeckBar'
 import { supabase } from '@/lib/supabase'
 import { useCards } from '@/lib/hooks'
 import { sfx } from '@/lib/sound'
@@ -39,6 +40,7 @@ export default function Versus() {
   if (!bid || !b) return (
     <div className="w page"><div className="pagehead"><h2>Versus</h2><p className="sub">Pilih tepat 3 kartu ({sel.length}/3), lalu cari lawan. Semua perhitungan dilakukan di server.</p></div>
       {bid ? <p><Loader2 size={18} className="spin" /> Memuat battle...</p> : <>
+        <DeckBar cards={cards} sel={sel} onPick={ids => setSel(ids)} />
         <div className="grid">{loading ? <div className="empty">Memuat kartu...</div> : cards.map(c => <div key={c.id} onClick={() => toggle(c.id)} style={{ borderRadius: 18, outline: sel.includes(c.id) ? '4px solid var(--yl)' : 'none', outlineOffset: 4 }}><Card c={c} tilt={false} /></div>)}</div>
         <div style={{ marginTop: '1.5rem' }}><button className="btn rd" disabled={sel.length !== 3} onClick={find}><Users size={18} />Cari lawan</button></div></>}
       {err && <p className="err">{err}</p>}</div>)

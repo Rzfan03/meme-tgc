@@ -2,11 +2,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { Home, Library, Search, Shield, Sparkles, Swords, Store, Users, LogIn, LogOut, Settings, User } from 'lucide-react'
+import { Home, Library, Search, Shield, Sparkles, Swords, Store, Trophy, Users, LogIn, LogOut, Settings, User } from 'lucide-react'
 import { displayName, useProfile, useSignOut, useUser } from '@/lib/hooks'
 import { bukaArena } from '@/components/ArenaModal'
 import { NotifBell } from '@/components/NotifBell'
-const NAV = [{ href: '/', label: 'Beranda', Icon: Home }, { href: '/collection', label: 'Koleksi', Icon: Library }, { href: '/create', label: 'Buat Kartu', Icon: Sparkles }, { href: '/versus', label: 'Versus', Icon: Users }, { href: '/market', label: 'Market', Icon: Store }]
+const NAV = [{ href: '/', label: 'Beranda', Icon: Home }, { href: '/collection', label: 'Koleksi', Icon: Library }, { href: '/create', label: 'Buat Kartu', Icon: Sparkles }, { href: '/versus', label: 'Versus', Icon: Users }, { href: '/peringkat', label: 'Peringkat', Icon: Trophy }]
 export function Header() {
   const path = usePathname(), { user } = useUser(), { profile } = useProfile(), signOut = useSignOut()
   const [open, setOpen] = useState(false), box = useRef<HTMLDivElement>(null)

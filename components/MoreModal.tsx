@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Bell, LogIn, Search, Settings, Store, User, X } from 'lucide-react'
+import { Bell, LogIn, Search, Settings, Store, Trophy, User, X } from 'lucide-react'
 import { useNotifs, useUser } from '@/lib/hooks'
 
 // Menu "Lainnya" (paling kanan di navigasi). Dibuka lewat event 'menu-lainnya'.
@@ -32,6 +32,7 @@ export function MoreModal() {
       <div className="arena-box">
         <h3>Lainnya</h3>
         <button className="arena-opt" onClick={() => go('/pemain')}><Search size={22} /><span>Cari Pemain<small>Temukan pemain lain via nama</small></span></button>
+        <button className="arena-opt" onClick={() => go('/peringkat')}><Trophy size={22} /><span>Peringkat<small>Leaderboard rating & tantang pemain</small></span></button>
         <button className="arena-opt" onClick={() => go('/market')}><Store size={22} /><span>Marketplace<small>Beli & jual kartu dengan poin</small></span></button>
         <button className="arena-opt" onClick={() => go('/notif')}><Bell size={22} /><span>Notifikasi<small>{unread ? `${unread} belum dibaca` : 'Semua sudah dibaca'}</small></span></button>
         <button className="arena-opt" onClick={() => go('/account')}><User size={22} /><span>Profil<small>Akun, kartu & halaman publik</small></span></button>
