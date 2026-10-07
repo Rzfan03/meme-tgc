@@ -4,7 +4,7 @@ import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import type { CardData } from './game'
 
-export type Profile = { nickname: string; wins: number; losses: number; rating: number; avatar: string | null; points: number; is_admin: boolean }
+export type Profile = { nickname: string; wins: number; losses: number; rating: number; avatar: string | null; points: number; is_admin: boolean; banned: boolean }
 
 // Session Supabase dibaca sekali lalu di-broadcast ke semua komponen yang pakai useUser.
 let current: Session | null = null
@@ -36,7 +36,7 @@ export function useProfile() {
   const [p, setP] = useState<Profile | null>(null)
   const reload = useCallback(async () => {
     if (!user) { setP(null); return }
-    const { data } = await supabase.from('profiles').select('nickname,wins,losses,rating,avatar,is_admin').eq('id', user.id).maybeSingle()
+    const { data } = await supabase.from('profiles').select('nickname,wins,losses,rating,avatar,is_admin,banned').eq('id', user.id).maybeSingle()
     if (!data) { setP(null); return }
     const { data: pts } = await supabase.from('profiles').select('points').eq('id', user.id).maybeSingle()
     setP({ ...(data as Profile), points: (pts as { points?: number } | null)?.points ?? 0 } satisfies Profile)
