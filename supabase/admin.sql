@@ -119,10 +119,11 @@ end $$;
 
 create or replace function public.admin_set_ban(pid uuid, banned boolean) returns void
 language plpgsql security definer set search_path=public as $$
+declare v_ban boolean := banned;
 begin
   perform public.cek_admin();
   if pid = auth.uid() then raise exception 'Tidak bisa ban diri sendiri'; end if;
-  update profiles set banned = banned where id = pid;
+  update profiles set banned = v_ban where id = pid;
   if not found then raise exception 'Pemain tidak ditemukan'; end if;
 end $$;
 
