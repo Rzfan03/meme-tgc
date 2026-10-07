@@ -32,7 +32,7 @@ export default function Og() {
           <div style={{ display: 'flex', flexDirection: 'column', fontSize: 86, fontWeight: 800, lineHeight: 1.02, letterSpacing: -3 }}>Foto apa saja bisa jadi kartu jagoan.</div>
           <div style={{ fontSize: 30, opacity: 0.85, marginTop: 26, lineHeight: 1.35 }}>Upload meme atau foto, AI memberi nama, element, &amp; jurus — langsung adu di arena.</div>
           <div style={{ display: 'flex', gap: 14, marginTop: 34 }}>
-            {(Object.keys(ELEMENTS) as (keyof typeof ELEMENTS)[]).map(e => (
+            {(Object.keys(ELEMENTS) as (keyof typeof ELEMENTS)[]).filter(e => e !== 'Ultra Card').map(e => (
               <div key={e} style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.4)', border: `2px solid ${ELEMENTS[e]}`, borderRadius: 999, padding: '10px 20px', fontSize: 20, fontWeight: 700 }}>
                 <div style={{ width: 14, height: 14, borderRadius: 999, background: ELEMENTS[e], marginRight: 10 }} />
                 {e}

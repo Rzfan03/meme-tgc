@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, Lock, Plus, RefreshCw, Swords } from 'lucide-react'
+import { RiEyeLine, RiLockLine, RiAddLine, RiRefreshLine, RiSwordLine } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { DeckBar } from '@/components/DeckBar'
 import { PageSkeleton } from '@/components/Skeleton'
@@ -42,22 +42,22 @@ export default function Rooms() {
       {!cards.length && <p className="sub">Kamu belum punya kartu. Buat dulu di menu Buat Kartu.</p>}
       <div className="step" style={{ margin: '1rem 0' }}><h3>Buat room</h3>
         <div className="bar" style={{ marginTop: '.8rem' }}><input placeholder="Nama room" aria-label="Nama room" maxLength={40} value={name} onChange={e => setName(e.target.value)} /><input type="password" placeholder="Password (opsional)" aria-label="Password room" maxLength={50} value={pw} onChange={e => setPw(e.target.value)} />
-          <button className="btn bl" disabled={!name.trim()} onClick={create}><Plus size={18} />Buat room</button></div></div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}><h3>Daftar room ({rooms.length})</h3><button className="btn ln" onClick={load}><RefreshCw size={16} />Segarkan</button></div>
+          <button className="btn bl" disabled={!name.trim()} onClick={create}><RiAddLine size={18} />Buat room</button></div></div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}><h3>Daftar room ({rooms.length})</h3><button className="btn ln" onClick={load}><RiRefreshLine size={16} />Segarkan</button></div>
       {err && <p className="err">{err}</p>}
       <div style={{ display: 'grid', gap: '.8rem', marginTop: '1rem' }}>
         {rooms.length ? rooms.map(r => (
           <div className="step" key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: 160 }}><h3>{r.has_password && <Lock size={16} />} {r.name}</h3><p>Host: {r.host_name}{user?.user_metadata?.full_name === r.host_name ? ' (kamu)' : ''}</p></div>
+            <div style={{ flex: 1, minWidth: 160 }}><h3>{r.has_password && <RiLockLine size={16} />} {r.name}</h3><p>Host: {r.host_name}{user?.user_metadata?.full_name === r.host_name ? ' (kamu)' : ''}</p></div>
             {ask === r.id && <input className="bar" style={{ border: '2px solid var(--ln)', borderRadius: 999, padding: '.5rem 1rem', background: 'var(--sf)', color: 'var(--ink)' }} type="password" placeholder="Password room" aria-label="Password room" value={jp} onChange={e => setJp(e.target.value)} />}
-            <button className="btn" onClick={() => join(r)}><Swords size={18} />Gabung</button></div>
+            <button className="btn" onClick={() => join(r)}><RiSwordLine size={18} />Gabung</button></div>
         )) : <p className="sub">Belum ada room yang menunggu. Buat yang pertama!</p>}</div>
       {live.length > 0 && <> <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}><h3>Sedang berlangsung ({live.length})</h3></div>
         <div style={{ display: 'grid', gap: '.8rem', marginTop: '1rem' }}>
           {live.map(r => (
             <div className="step" key={r.id} style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 160 }}><h3>{r.name}</h3><p>{r.p1_name} vs {r.p2_name}</p></div>
-              <button className="btn ln" onClick={() => go({ data: r.id, error: null })}><Eye size={18} />Nonton</button></div>
+              <button className="btn ln" onClick={() => go({ data: r.id, error: null })}><RiEyeLine size={18} />Nonton</button></div>
           ))}</div></>}</div>
   )
 }

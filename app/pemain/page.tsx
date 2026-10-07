@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Search, User } from 'lucide-react'
+import { RiSearchLine, RiUserLine } from 'react-icons/ri'
 import { supabase } from '@/lib/supabase'
 
 type Pemain = { id: string; nickname: string; avatar: string | null; rating: number; wins: number; losses: number }
@@ -24,7 +24,7 @@ export default function Pemain() {
       <div className="pagehead"><h2>Cari Pemain</h2><p className="sub">Temukan pemain lain lewat nama tampilan.</p></div>
       <form className="bar" style={{ maxWidth: 480 }} onSubmit={cari}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Nama pemain..." aria-label="Nama pemain" />
-        <button className="btn bl" disabled={busy || !q.trim()}><Search size={18} />Cari</button>
+        <button className="btn bl" disabled={busy || !q.trim()}><RiSearchLine size={18} />Cari</button>
       </form>
       {pesan && <p className="sub" style={{ marginTop: '1rem' }}>{pesan}</p>}
       {hasil && hasil.length > 0 && (
@@ -33,7 +33,7 @@ export default function Pemain() {
             const awal = (p.nickname || '?').trim().slice(0, 1).toUpperCase()
             return (
               <Link key={p.id} href={`/p/${p.id}`} className="row" style={{ textDecoration: 'none' }}>
-                <span className="ow-av">{p.avatar ? <img src={p.avatar} alt="" /> : p.nickname ? awal : <User size={18} />}</span>
+                <span className="ow-av">{p.avatar ? <img src={p.avatar} alt="" /> : p.nickname ? awal : <RiUserLine size={18} />}</span>
                 <div><b>{p.nickname || 'Tanpa nama'}</b><br /><small className="sub" style={{ margin: 0 }}>{p.wins} menang · {p.losses} kalah · rating {p.rating}</small></div>
               </Link>
             )

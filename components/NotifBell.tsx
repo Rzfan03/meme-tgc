@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { Bell, Check } from 'lucide-react'
+import { RiBellLine, RiCheckLine } from 'react-icons/ri'
 import { useNotifs } from '@/lib/hooks'
 
 const waktu = (iso: string) => {
@@ -26,7 +26,7 @@ export function NotifBell() {
   return (
     <div className="nbell" ref={box}>
       <button className="nbell-btn" aria-haspopup="menu" aria-expanded={open} aria-label={`Notifikasi${unread ? `, ${unread} belum dibaca` : ''}`} onClick={() => setOpen(!open)}>
-        <Bell size={18} />
+        <RiBellLine size={18} />
         {unread > 0 && <span className="nbadge">{unread > 99 ? '99+' : unread}</span>}
       </button>
       {open && <div className="menu ndrop" role="menu" aria-label="Notifikasi">
@@ -39,7 +39,7 @@ export function NotifBell() {
               <small>{waktu(n.created_at)}</small>
             </div>
           ))}
-          {unread > 0 && <button className="nmark" onClick={markAll}><Check size={16} />Tandai semua dibaca</button>}
+          {unread > 0 && <button className="nmark" onClick={markAll}><RiCheckLine size={16} />Tandai semua dibaca</button>}
         </> : <p className="nempty">Belum ada notifikasi.</p>}
       </div>}
     </div>

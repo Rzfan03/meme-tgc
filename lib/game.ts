@@ -1,6 +1,7 @@
-export const ELEMENTS = { 'Holy Card': '#FFD700', Chaoz: '#9B6BFF', Mogger: '#2FCA6A', Sampah: '#A0703C', 'Tai ayam': '#9AA3AD' } as const
+export const ELEMENTS = { 'Holy Card': '#FFD700', Chaoz: '#9B6BFF', Mogger: '#2FCA6A', Sampah: '#A0703C', 'Tai ayam': '#9AA3AD', 'Ultra Card': '#FF3B3B' } as const
 export type El = keyof typeof ELEMENTS
-export const BEATS: Record<El, El> = { 'Holy Card': 'Mogger', Mogger: 'Chaoz', Chaoz: 'Sampah', Sampah: 'Tai ayam', 'Tai ayam': 'Holy Card' }
+// Ultra Card beat Holy Card (ikut default else 'Holy Card' di SQL battle), tidak dikalahkan elemen lain — kartu chase 0,5-1%.
+export const BEATS: Record<El, El> = { 'Holy Card': 'Mogger', Mogger: 'Chaoz', Chaoz: 'Sampah', Sampah: 'Tai ayam', 'Tai ayam': 'Holy Card', 'Ultra Card': 'Holy Card' }
 export const DAILY_LIMIT = 10
 export type CardData = { id: string; name: string; element: El; hp: number; atk: number; def: number; spd: number; skill: string; skill_desc: string; hue: number; image_url?: string | null; emoji?: string }
 

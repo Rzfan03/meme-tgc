@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Store, X } from 'lucide-react'
+import { RiStoreLine, RiCloseLine } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { Share } from '@/components/Share'
 import { ELEMENTS, type CardData } from '@/lib/game'
@@ -64,7 +64,7 @@ export function CardDetail({ c, onClose }: { c: CardData | null; onClose: () => 
   return (
     <div className="modal on" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="mb" role="dialog" aria-modal="true" aria-label={`Detail kartu ${c.name}`}>
-        <button className="x" onClick={onClose} aria-label="Tutup detail kartu"><X size={20} /></button>
+        <button className="x" onClick={onClose} aria-label="Tutup detail kartu"><RiCloseLine size={20} /></button>
 
         <div className="cd-card"><Card c={c} /></div>
 
@@ -92,7 +92,7 @@ export function CardDetail({ c, onClose }: { c: CardData | null; onClose: () => 
               </div>
               : <div className="bar" style={{ margin: 0 }}>
                 <input inputMode="numeric" placeholder="Harga jual (min 100 poin)" aria-label="Harga jual" value={price} onChange={e => setPrice(e.target.value.replace(/[^\d]/g, ''))} />
-                <button className="btn" disabled={busy || Number(price) < 100} onClick={pasang}><Store size={16} />Jual di marketplace</button>
+                <button className="btn" disabled={busy || Number(price) < 100} onClick={pasang}><RiStoreLine size={16} />Jual di marketplace</button>
               </div>}
             {lmsg && <p className={lerr ? 'err' : 'ok'} style={{ marginTop: '.5rem', marginBottom: 0 }}>{lmsg}</p>}
           </div>

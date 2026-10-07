@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Swords, RotateCcw, Sparkles } from 'lucide-react'
+import { RiSwordLine, RiRefreshLine, RiSparkling2Line } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { PageSkeleton } from '@/components/Skeleton'
 import { useCards } from '@/lib/hooks'
@@ -36,8 +36,8 @@ export default function Arena() {
     const n = structuredClone(b); n.mi = i; n.busy = true; n.log.push('Kamu mengganti ke ' + n.me[i].name); setB(n); later()
   }
   if (loading) return <PageSkeleton />
-  if (!loading && !cards.length) return <div className="w page"><div className="pagehead"><h2>Arena</h2><p className="sub">Kamu butuh minimal satu kartu untuk bertarung.</p><div className="actions"><Link href="/create" className="btn"><Sparkles size={18} />Buat kartu</Link></div></div></div>
-  if (!b) return <div className="w page"><div className="pagehead"><h2>Arena</h2><p className="sub">Tiga kartu acak dari koleksimu melawan bot. Elemen unggul memberi damage 1,5 kali.</p><div className="actions"><button className="btn bl" disabled={loading} onClick={start}><Swords size={18} />Mulai battle</button></div></div></div>
+  if (!loading && !cards.length) return <div className="w page"><div className="pagehead"><h2>Arena</h2><p className="sub">Kamu butuh minimal satu kartu untuk bertarung.</p><div className="actions"><Link href="/create" className="btn"><RiSparkling2Line size={18} />Buat kartu</Link></div></div></div>
+  if (!b) return <div className="w page"><div className="pagehead"><h2>Arena</h2><p className="sub">Tiga kartu acak dari koleksimu melawan bot. Elemen unggul memberi damage 1,5 kali.</p><div className="actions"><button className="btn bl" disabled={loading} onClick={start}><RiSwordLine size={18} />Mulai battle</button></div></div></div>
   const win = b.foe.every(c => c.hp <= 0)
   const fg = (c: F, id: string) => <div className={`fg ${b.pop?.id === id ? 'hit' : ''}`} key={id + b.log.length}>{b.pop?.id === id && <span className="dmg">-{b.pop.d}</span>}<Card c={c} tilt={false} /><div className="hp"><div style={{ width: (c.hp / c.max) * 100 + '%' }} /></div></div>
   const mini = (c: F, i: number, mine: boolean) => <div key={c.id + i} className={`mini ${(mine ? b.mi : b.fi) === i ? 'act' : ''} ${c.hp <= 0 ? 'dead' : ''}`} style={{ '--h': c.hue, cursor: mine ? 'pointer' : 'default' } as React.CSSProperties} onClick={() => mine && swap(i)}>{c.image_url ? <img src={c.image_url} alt="" /> : c.emoji}<small>{c.hp}</small></div>
@@ -47,7 +47,7 @@ export default function Arena() {
       <div className="field">{fg(b.foe[b.fi], 'ff')}<div className="vs d">VS</div>{fg(b.me[b.mi], 'fm')}</div>
       <div className="tray">{b.me.map((c, i) => mini(c, i, true))}</div>
       <p className="turn">{b.over ? (win ? 'Kamu menang!' : 'Kamu kalah. Coba lagi!') : b.busy ? 'Giliran lawan...' : 'Giliranmu. Serang atau ketuk kartu untuk ganti.'}</p>
-      <div style={{ display: 'flex', gap: '.7rem', justifyContent: 'center' }}><button className="btn rd" disabled={b.busy || b.over} onClick={attack}><Swords size={18} />Serang</button><button className="btn ln" onClick={start}><RotateCcw size={18} />Battle baru</button></div>
+      <div style={{ display: 'flex', gap: '.7rem', justifyContent: 'center' }}><button className="btn rd" disabled={b.busy || b.over} onClick={attack}><RiSwordLine size={18} />Serang</button><button className="btn ln" onClick={start}><RiRefreshLine size={18} />Battle baru</button></div>
       <div className="log">{b.log.slice(-4).map((l, i) => <p key={i}>{l}</p>)}</div></div>
   )
 }

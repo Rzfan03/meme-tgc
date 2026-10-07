@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Star, X } from 'lucide-react'
+import { RiStarLine, RiCloseLine } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { useCards, useProfile } from '@/lib/hooks'
 import type { CardData } from '@/lib/game'
@@ -44,7 +44,7 @@ export function Pamer() {
 
   return (
     <>
-      <button className="btn" onClick={() => { setSel([]); setOpen(true) }}><Star size={18} />Pamer kartu</button>
+      <button className="btn" onClick={() => { setSel([]); setOpen(true) }}><RiStarLine size={18} />Pamer kartu</button>
 
       {open && (
         <div className="pamer">
@@ -53,7 +53,7 @@ export function Pamer() {
             <div className="pamer-head">
               <h3>Pamer kartu</h3>
               <p className="sub">Tarik kartu ke pameran atau ketuk untuk memilih (maks {MAX}).</p>
-              <button className="x" onClick={close} aria-label="Tutup pameran"><X size={20} /></button>
+              <button className="x" onClick={close} aria-label="Tutup pameran"><RiCloseLine size={20} /></button>
             </div>
 
             <div className="pamer-strip" onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (drag && !sel.includes(drag)) setSel(s => [...s, drag].slice(0, MAX)); setDrag(null) }}>
@@ -61,7 +61,7 @@ export function Pamer() {
                 ? sel.map(id => { const c = byId(id); if (!c) return null; return (
                   <div key={id} className="pamer-slot" draggable onDragStart={() => setDrag(id)} onDragEnd={() => setDrag(null)} onDrop={e => { e.preventDefault(); e.stopPropagation(); if (drag && drag !== id) into(drag, id); setDrag(null) }}>
                     <Card c={c} tilt={false} w={110} />
-                    <button className="rm" aria-label={`Hapus ${c.name} dari pameran`} onClick={() => toggle(id)}><X size={12} /></button>
+                    <button className="rm" aria-label={`Hapus ${c.name} dari pameran`} onClick={() => toggle(id)}><RiCloseLine size={12} /></button>
                   </div>) })
                 : <p className="sub" style={{ margin: 'auto' }}>Belum ada kartu. Tarik atau ketuk kartu di bawah.</p>}
             </div>

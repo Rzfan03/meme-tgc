@@ -1,11 +1,12 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Library, Settings, User, Camera } from 'lucide-react'
+import { RiBookOpenLine, RiSettings3Line, RiUserLine, RiCameraLine } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { Pamer } from '@/components/Pamer'
 import { Share } from '@/components/Share'
 import { CardGridSkeleton } from '@/components/Skeleton'
+import { QuestToday } from '@/components/QuestToday'
 import { displayName, useCards, useProfile, useUser } from '@/lib/hooks'
 
 const THEMES = [['sistem', 'Sistem'], ['terang', 'Terang'], ['gelap', 'Gelap']] as const
@@ -59,33 +60,35 @@ export default function Account() {
     <div className="w page">
       <div className="pagehead"><h2>Akun</h2><p className="sub">{user.email}</p></div>
 
-      <section className="panel" id="profil">
-        <h3><User size={20} />Profil</h3>
+      <QuestToday />
+
+      <section className="panel" id="profil" style={{ marginTop: '1.2rem' }}>
+        <h3><RiUserLine size={20} />Profil</h3>
         <div className="row">
           <button className="av av-lg" onClick={() => file.current?.click()} title="Ganti avatar" aria-label="Ganti avatar">
-            {profile?.avatar ? <img src={profile.avatar} alt="" /> : <Camera size={22} />}
+            {profile?.avatar ? <img src={profile.avatar} alt="" /> : <RiCameraLine size={22} />}
           </button>
           <div><b>{displayName(user)}</b><br /><small className="sub" style={{ margin: 0 }}>{profile?.nickname ?? 'Belum ada nama tampilan'}</small></div>
           <input ref={file} type="file" accept="image/*" hidden onChange={e => pick(e.target.files?.[0])} />
         </div>
-        <div className="bar" style={{ margin: '1rem 0 0' }}>
-          <Link href={`/p/${user.id}`} className="btn ln"><User size={18} />Halaman profil publik</Link>
+        <div className="bar" style={{ margin: '1rem 0 0', flexWrap: 'wrap' }}>
+          <Link href={`/p/${user.id}`} className="btn ln"><RiUserLine size={18} />Halaman profil publik</Link>
           <Pamer />
           <Share path={`/p/${user.id}`} title={`Profil ${profile?.nickname ?? displayName(user)} · MultiVerse`}>Bagikan profil</Share>
         </div>
         {profile && <>
-          <div className="row" style={{ margin: '1.2rem 0' }}>
+          <div className="row" style={{ margin: '1.2rem 0', gap: '.6rem' }}>
             <div className="stat"><b>{profile.wins}</b><small>Menang</small></div>
             <div className="stat"><b>{profile.losses}</b><small>Kalah</small></div>
             <div className="stat"><b>{profile.rating}</b><small>Rating</small></div>
             <div className="stat"><b>{profile.points.toLocaleString('id-ID')}</b><small>Poin</small></div>
           </div>
-          <div className="bar" style={{ margin: 0 }}>
-            <input value={nick} maxLength={24} onChange={e => setNick(e.target.value)} placeholder="Nama tampilan" aria-label="Nama tampilan" />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.6rem', margin: '0 0 1rem', alignItems: 'center' }}>
+            <input style={{ flex: '1 1 160px', minWidth: 0 }} value={nick} maxLength={24} onChange={e => setNick(e.target.value)} placeholder="Nama tampilan" aria-label="Nama tampilan" />
             <button className="btn" disabled={busy || !nick.trim()} onClick={async () => { setBusy(true); const { error } = await save({ nickname: nick.trim() }); setBusy(false); say(error ? `Gagal: ${error}` : 'Tersimpan!') }}>Simpan</button>
           </div>
 
-          <h3 style={{ marginTop: '1.6rem' }}><Library size={20} />Kartu terbaru</h3>
+          <h3 style={{ marginTop: '1.6rem' }}><RiBookOpenLine size={20} />Kartu terbaru</h3>
           <div className="grid">
             {loading ? <CardGridSkeleton n={6} />
               : cards.length ? cards.slice(0, 6).map(c => <Link key={c.id} href={`/c/${c.id}`} className="kt-link"><Card c={c} /></Link>)
@@ -98,7 +101,7 @@ export default function Account() {
       </section>
 
       <section className="panel" id="pengaturan">
-        <h3><Settings size={20} />Pengaturan</h3>
+        <h3><RiSettings3Line size={20} />Pengaturan</h3>
         <p className="sub" style={{ margin: 0 }}>Tampilan</p>
         <div className="seg" style={{ marginTop: '.6rem' }}>
           {THEMES.map(([val, label]) => <button key={val} className={`chip${theme === val ? ' on' : ''}`} onClick={() => { setTheme(val); applyTheme(val); localStorage.setItem(THEME_KEY, val) }}>{label}</button>)}

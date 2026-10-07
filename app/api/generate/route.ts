@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
   const v = w.map(x => x * 7)
   const hp = v[0] + 30
   const atk = v[1], def = v[2], spd = v[3]
-  const element: El = kategoriDariStat(hp, atk, def, spd)
+  // chance Ultra Card 0,5–1% (threshold acak di antara keduanya)
+  const element: El = Math.random() < 0.005 + Math.random() * 0.005 ? 'Ultra Card' : kategoriDariStat(hp, atk, def, spd)
 
   let image_url = ''
   if (f) {

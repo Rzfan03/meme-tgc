@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Camera, Loader2, Sparkles, Swords, X } from 'lucide-react'
+import { RiCameraLine, RiLoader4Line, RiSparkling2Line, RiSwordLine, RiCloseLine } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { Share } from '@/components/Share'
 import { CardDetail } from '@/components/CardDetail'
@@ -73,7 +73,7 @@ export default function Create() {
       <div className="create">
         <div className="stack">
           <div className="namerow">
-            <Swords size={22} />
+            <RiSwordLine size={22} />
             <input
               id="n"
               className="namin"
@@ -90,8 +90,8 @@ export default function Create() {
           <div className={`photobox ${preview ? 'has' : ''}`} onClick={() => fileRef.current?.click()}>
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={e => { const f = e.target.files?.[0]; if (f?.type.startsWith('image/')) setPhoto(f); e.target.value = '' }} />
             {preview
-              ? <><img src={preview} alt="Foto kartu" /><span className="rm" onClick={e => { e.stopPropagation(); setPhoto(null) }}><X size={14} /></span></>
-              : <><Camera size={20} /><span>Foto kartu (opsional)</span></>}
+              ? <><img src={preview} alt="Foto kartu" /><span className="rm" onClick={e => { e.stopPropagation(); setPhoto(null) }}><RiCloseLine size={14} /></span></>
+              : <><RiCameraLine size={20} /><span>Foto kartu (opsional)</span></>}
           </div>
 
           <div className="chips">
@@ -101,7 +101,7 @@ export default function Create() {
           </div>
 
           <button className="btn bl full" disabled={!canGo} onClick={gen}>
-            {busy ? <Loader2 size={18} className="spin" /> : <Sparkles size={18} />}
+            {busy ? <RiLoader4Line size={18} className="spin" /> : <RiSparkling2Line size={18} />}
             {busy ? 'AI sedang menghitung...' : photo ? 'Cetak dengan foto' : 'Cetak kartu'}
           </button>
           {err && <p className="err">{err}</p>}
@@ -109,8 +109,8 @@ export default function Create() {
 
         <div className="stage">
           {card
-            ? <div className="rv"><Card c={card} onClick={() => setOpen(card)} /><p style={{ margin: '1.2rem 0 .7rem' }}><b>{card.name}</b> masuk koleksi sebagai <b>{card.element}</b></p><div className="bar" style={{ justifyContent: 'center', margin: 0 }}><Link href="/collection" className="btn">Lihat koleksi</Link><button className="btn ln" onClick={() => setCard(null)}>Cetak lagi</button><Share path={`/c/${card.id}`} title={`${card.name} · MultiVerse`}>Share</Share></div></div>
-            : <div className="idle"><Sparkles size={40} /><p>Ketik nama karakter,<br />kartunya akan muncul di sini.</p></div>}
+            ? <div className="rv" style={{ width: '100%', display: 'grid', justifyItems: 'center', gap: '.7rem' }}><Card c={card} onClick={() => setOpen(card)} /><p style={{ margin: '.5rem 0 .3rem', textAlign: 'center' }}><b>{card.name}</b> masuk koleksi sebagai <b>{card.element}</b></p><div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', justifyContent: 'center' }}><Link href="/collection" className="btn">Lihat koleksi</Link><button className="btn ln" onClick={() => setCard(null)}>Cetak lagi</button><Share path={`/c/${card.id}`} title={`${card.name} · MultiVerse`}>Share</Share></div></div>
+            : <div className="idle"><RiSparkling2Line size={40} /><p>Ketik nama karakter,<br />kartunya akan muncul di sini.</p></div>}
         </div>
       </div>
       <CardDetail c={open} onClose={() => setOpen(null)} />

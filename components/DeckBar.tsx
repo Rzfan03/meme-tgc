@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Layers, Plus, Trash2 } from 'lucide-react'
+import { RiStackLine, RiAddLine, RiDeleteBinLine } from 'react-icons/ri'
 import { supabase } from '@/lib/supabase'
 import { useUser } from '@/lib/hooks'
 import { toastSuccess } from '@/lib/alert'
@@ -41,14 +41,14 @@ export function DeckBar({ cards, sel, onPick }: P) {
   if (!user) return null
   return (
     <div className="scroll" style={{ gap: '.6rem', alignItems: 'center', marginTop: '.8rem' }}>
-      <Layers size={16} className="mut" style={{ flex: 'none' }} />
+      <RiStackLine size={16} className="mut" style={{ flex: 'none' }} />
       {decks.map(d => (
         <span key={d.id} className="chip" role="button" tabIndex={0} onClick={() => pick(d)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') pick(d) }} title="Muat deck ini">
           {d.name}
-          <button aria-label={`Hapus deck ${d.name}`} onClick={e => { e.stopPropagation(); del(d.id) }} style={{ border: 0, background: 'none', color: 'inherit', marginLeft: '.3rem', padding: 0, display: 'inline-flex' }}><Trash2 size={12} /></button>
+          <button aria-label={`Hapus deck ${d.name}`} onClick={e => { e.stopPropagation(); del(d.id) }} style={{ border: 0, background: 'none', color: 'inherit', marginLeft: '.3rem', padding: 0, display: 'inline-flex' }}><RiDeleteBinLine size={12} /></button>
         </span>
       ))}
-      <button className="chip" onClick={save} disabled={sel.length !== 3} title="Simpan 3 kartu terpilih sebagai deck"><Plus size={14} />Simpan deck{sel.length === 3 ? '' : ' (3 kartu)'}</button>
+      <button className="chip" onClick={save} disabled={sel.length !== 3} title="Simpan 3 kartu terpilih sebagai deck"><RiAddLine size={14} />Simpan deck{sel.length === 3 ? '' : ' (3 kartu)'}</button>
     </div>
   )
 }

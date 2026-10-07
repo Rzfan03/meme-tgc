@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Coins, Heart, RotateCcw, Search, ShoppingCart, X } from 'lucide-react'
+import { RiCoinLine, RiHeartLine, RiHeartFill, RiRefreshLine, RiSearchLine, RiShoppingCartLine, RiCloseLine } from 'react-icons/ri'
 import { Card } from '@/components/Card'
 import { CardGridSkeleton } from '@/components/Skeleton'
 import { useProfile, useUser } from '@/lib/hooks'
@@ -79,15 +79,15 @@ export default function Market() {
           <h2>Marketplace</h2>
           <p className="sub">Beli & jual kartu memakai poin.</p>
         </div>
-        {user && <span className="mkt-bal"><Coins size={18} />{pts.toLocaleString('id-ID')} <small>poinmu</small></span>}
+        {user && <span className="mkt-bal"><RiCoinLine size={18} />{pts.toLocaleString('id-ID')} <small>poinmu</small></span>}
       </div>
 
       <div className="mkt">
         <div className="mkt-tools">
           <div className="mkt-search">
-            <Search size={17} aria-hidden />
+            <RiSearchLine size={17} aria-hidden />
             <input value={q} placeholder="Cari kartu…" aria-label="Cari kartu" onChange={e => setQ(e.target.value)} />
-            {q && <button className="mkt-x" onClick={() => setQ('')} aria-label="Kosongkan pencarian"><X size={15} /></button>}
+            {q && <button className="mkt-x" onClick={() => setQ('')} aria-label="Kosongkan pencarian"><RiCloseLine size={15} /></button>}
           </div>
 
           <div className="mkt-chips" role="group" aria-label="Filter elemen">
@@ -102,7 +102,7 @@ export default function Market() {
           <div className="mkt-row">
             <span className="mkt-count">{loading ? 'Memuat…' : `${shown.length} kartu`}</span>
             <div className="mkt-row-btns">
-              <button className="mkt-reset" onClick={reset}><RotateCcw size={13} />Reset</button>
+              <button className="mkt-reset" onClick={reset}><RiRefreshLine size={13} />Reset</button>
               <select aria-label="Urutkan" value={sort} onChange={e => setSort(e.target.value as typeof sort)}>
                 <option value="baru">Terbaru</option>
                 <option value="murah">Harga termurah</option>
@@ -118,7 +118,7 @@ export default function Market() {
                 <div key={l.id} className="p-card">
                   <div className="p-stage" style={{ '--elm': ELEMENTS[l.element as El] } as React.CSSProperties}>
                     <span className="p-badge" style={{ background: ELEMENTS[l.element as El] }}>{l.element}</span>
-                    <button className={`p-heart${wish.has(l.id) ? ' on' : ''}`} onClick={() => toggleWish(l.id)} aria-pressed={wish.has(l.id)} aria-label={wish.has(l.id) ? 'Hapus dari wishlist' : 'Simpan ke wishlist'}><Heart size={17} strokeWidth={2.4} /></button>
+                    <button className={`p-heart${wish.has(l.id) ? ' on' : ''}`} onClick={() => toggleWish(l.id)} aria-pressed={wish.has(l.id)} aria-label={wish.has(l.id) ? 'Hapus dari wishlist' : 'Simpan ke wishlist'}><RiHeartLine size={17} /></button>
                     <Link href={`/c/${l.card_id}`} className="kt-link"><Card c={toCard(l)} /></Link>
                   </div>
                   <div className="p-body">
@@ -129,8 +129,8 @@ export default function Market() {
                       <span className="p-seller">{l.seller_nickname}</span>
                     </div>
                     <div className="p-bar">
-                      <span className="p-price"><Coins size={15} />{l.price.toLocaleString('id-ID')}<small>poin</small></span>
-                      <button className="p-buy" onClick={() => { setBerr(''); setBuy(l) }}><ShoppingCart size={15} />Beli</button>
+                      <span className="p-price"><RiCoinLine size={15} />{l.price.toLocaleString('id-ID')}<small>poin</small></span>
+                      <button className="p-buy" onClick={() => { setBerr(''); setBuy(l) }}><RiShoppingCartLine size={15} />Beli</button>
                     </div>
                   </div>
                 </div>
@@ -140,7 +140,7 @@ export default function Market() {
 
       {buy && <div className="modal on" onClick={e => e.target === e.currentTarget && setBuy(null)}>
         <div className="mb buy" role="dialog" aria-modal="true" aria-label="Konfirmasi pembelian">
-          <button className="x" onClick={() => setBuy(null)} aria-label="Batal"><X size={18} /></button>
+          <button className="x" onClick={() => setBuy(null)} aria-label="Batal"><RiCloseLine size={18} /></button>
           <h3 style={{ marginTop: 0, marginBottom: '.3rem' }}>Beli kartu ini?</h3>
           <div className="buy-card">
             <Card c={toCard(buy)} w={118} />
@@ -148,7 +148,7 @@ export default function Market() {
               <span className="rdot" style={{ background: ELEMENTS[buy.element as El], marginBottom: '.2rem', boxShadow: `0 0 6px ${ELEMENTS[buy.element as El]}` }} />
               <b>{buy.name}</b>
               <small>{buy.seller_nickname}</small>
-              <small><Coins size={11} style={{ verticalAlign: -1 }} /> {buy.price.toLocaleString('id-ID')} poin</small>
+              <small><RiCoinLine size={11} style={{ verticalAlign: -1 }} /> {buy.price.toLocaleString('id-ID')} poin</small>
             </div>
           </div>
           <div className="buy-stats">

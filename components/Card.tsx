@@ -8,7 +8,11 @@ const FRAMES = {
   Mogger: { frame: 'linear-gradient(145deg,#c9f7da,#2ea85f 45%,#ddfbee 70%,#1a7a40)', foil: .35 },
   Sampah: { frame: 'linear-gradient(145deg,#ecd6be,#9c6b33 45%,#f5e5cf 70%,#6f4a1f)', foil: .15 },
   'Tai ayam': { frame: 'linear-gradient(145deg,#d7dade,#7d838c 50%,#e2e5e9)', foil: 0 },
+  'Ultra Card': { frame: 'linear-gradient(145deg,#4a050c,#7e0b16 45%,#3f040a 70%,#260306)', foil: .7 },
 } as const
+
+// Warna muka kartu berbeda dari warna badge: Ultra Card mukanya merah gelap, aksen/teks tetap merah terang.
+const FACE: Record<string, string> = { 'Ultra Card': '#45060C' }
 
 const STATS = [
   { k: 'atk', label: 'ATK', v: '#ff8b7a' },
@@ -16,8 +20,8 @@ const STATS = [
   { k: 'spd', label: 'SPD', v: '#8ff0a4' },
 ] as const
 
-// Glow saat hover: Holy Card rainbow, Chaoz/Mogger sesuai warna elemen, sisanya tidak.
-const GLOW: Record<string, 'rainbow' | 'color' | 'none'> = { 'Holy Card': 'rainbow', Chaoz: 'color', Mogger: 'color', Sampah: 'none', 'Tai ayam': 'none' }
+// Glow saat hover: Holy Card rainbow, Ultra Card api, Chaoz/Mogger sesuai warna elemen, sisanya tidak.
+const GLOW: Record<string, 'rainbow' | 'color' | 'fire' | 'none'> = { 'Holy Card': 'rainbow', 'Ultra Card': 'fire', Chaoz: 'color', Mogger: 'color', Sampah: 'none', 'Tai ayam': 'none' }
 
 export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boolean; w?: number; onClick?: () => void }) {
   const ref = useRef<HTMLElement>(null)
@@ -44,9 +48,10 @@ export function Card({ c, tilt = true, w, onClick }: { c: CardData; tilt?: boole
   }
   const key = (e: KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click() }
 
+  const face = FACE[c.element] ?? glow
   const vars = {
-    '--c1': 'color-mix(in srgb, ' + glow + ' 26%, #070A1E)',
-    '--c2': glow,
+    '--c1': 'color-mix(in srgb, ' + face + ' 26%, #070A1E)',
+    '--c2': face,
     '--glow': glow,
     '--frame': fr.frame,
     '--foil': holy ? 1 : fr.foil,

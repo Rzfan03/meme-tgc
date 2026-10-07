@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { Bell, Check } from 'lucide-react'
+import { RiBellLine, RiCheckLine } from 'react-icons/ri'
 import { useNotifs } from '@/lib/hooks'
 
 const waktu = (iso: string) => {
@@ -22,7 +22,7 @@ export default function NotifPage() {
           <h2>Notifikasi</h2>
           <p className="sub">{unread ? `${unread} belum dibaca` : 'Semua sudah dibaca.'}</p>
         </div>
-        {list.length > 0 && <button className="btn ln" onClick={markAll}><Check size={16} />Tandai semua dibaca</button>}
+        {list.length > 0 && <button className="btn ln" onClick={markAll}><RiCheckLine size={16} />Tandai semua dibaca</button>}
       </div>
 
       <div className="panel notif-list">
@@ -34,7 +34,7 @@ export default function NotifPage() {
               <small>{waktu(n.created_at)}</small>
             </div>
           ))
-          : <div className="empty"><Bell size={26} /><span>Belum ada notifikasi.</span><small>Pemberitahuan seperti hasil battle dan pembelian akan muncul di sini.</small></div>}
+          : <div className="empty"><RiBellLine size={26} /><span>Belum ada notifikasi.</span><small>Pemberitahuan seperti hasil battle dan pembelian akan muncul di sini.</small></div>}
       </div>
 
       <p className="sub" style={{ textAlign: 'center' }}><Link href="/" className="mkt-reset">Kembali ke beranda</Link></p>

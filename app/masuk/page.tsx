@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { LogIn, UserPlus } from 'lucide-react'
+import { RiLoginBoxLine, RiUserAddLine } from 'react-icons/ri'
 import { supabase } from '@/lib/supabase'
 
 export default function Masuk() {
@@ -28,7 +28,7 @@ export default function Masuk() {
       <form onSubmit={go} className="panel" style={{ display: 'grid', gap: '.8rem' }}>
         <input className="bar-in" type="email" required autoComplete="email" placeholder="Email" aria-label="Email" value={email} onChange={e => setEmail(e.target.value)} />
         <input className="bar-in" type="password" required minLength={6} autoComplete={mode === 'in' ? 'current-password' : 'new-password'} placeholder="Password (min. 6)" aria-label="Password" value={pass} onChange={e => setPass(e.target.value)} />
-        <button className="btn" disabled={busy}>{mode === 'in' ? <LogIn size={18} /> : <UserPlus size={18} />}{busy ? 'Tunggu…' : mode === 'in' ? 'Masuk' : 'Buat akun'}</button>
+        <button className="btn" disabled={busy}>{mode === 'in' ? <RiLoginBoxLine size={18} /> : <RiUserAddLine size={18} />}{busy ? 'Tunggu…' : mode === 'in' ? 'Masuk' : 'Buat akun'}</button>
         {msg && <p className="err">{msg}</p>}
         {sukses && <p className="ok">{sukses}<br /><button type="button" className="linkish" onClick={() => { setMode('in'); setSukses('') }}>Sudah konfirmasi? Masuk</button></p>}
       </form>
