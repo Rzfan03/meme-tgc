@@ -107,10 +107,14 @@ export default function Account() {
         <div className="seg" style={{ marginTop: '.6rem' }}>
           {THEMES.map(([val, label]) => <button key={val} className={`chip${theme === val ? ' on' : ''}`} onClick={() => { setTheme(val); applyTheme(val); localStorage.setItem(THEME_KEY, val) }}>{label}</button>)}
         </div>
-        <div className="bar" style={{ margin: '1.2rem 0 0' }}>
-          <button className="btn rd" onClick={signOut}><RiLogoutBoxLine size={18} />Keluar</button>
-        </div>
       </section>
+
+      {/* logout khusus mobile: menu Header (ada "Keluar") tidak tampil di ≤900px */}
+      <div className="mob-only" style={{ marginTop: '1.2rem' }}>
+        <button className="btn rd" style={{ width: '100%', justifyContent: 'center' }} onClick={signOut}>
+          <RiLogoutBoxLine size={18} />Keluar
+        </button>
+      </div>
     </div>
   )
 }
